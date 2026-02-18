@@ -20,108 +20,37 @@
             margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Top Bar */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px; z-index: 10; }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); }
+        .balance-badge { background: var(--glass); backdrop-filter: blur(20px); padding: 8px 15px; border-radius: 25px; border: 1px solid var(--glass-border); font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .add-btn { background: var(--accent); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; cursor: pointer; }
 
-        .balance-badge {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            padding: 8px 12px 8px 15px;
-            border-radius: 25px;
-            border: 1px solid var(--glass-border);
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .add-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        /* Content */
         .content { flex: 1; overflow-y: auto; padding-bottom: 120px; }
         .page { display: none; flex-direction: column; align-items: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Preview Area & Animations */
-        .preview-box {
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            margin-bottom: 20px;
-            position: relative; /* Для позиционирования эмодзи */
-        }
-
-        /* Dice Animation */
-        .dice-anim {
-            animation: rollDice 0.7s ease-out forwards;
-        }
-        @keyframes rollDice {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
-            50% { transform: translate(20px, -20px) rotate(180deg); opacity: 1; }
-            100% { transform: translate(0, 0) rotate(360deg); opacity: 1; }
-        }
-
-        /* Basket Animation */
-        .basket-anim {
-            animation: shootBasket 1s ease-out forwards;
-        }
-        @keyframes shootBasket {
-            0% { transform: translate(-50px, 50px) scale(0.8); opacity: 0; }
-            30% { transform: translate(0, -30px) scale(1.1); opacity: 1; }
-            70% { transform: translate(0, 10px); }
-            100% { transform: translate(0, 0); }
-        }
-
-        /* Football Animation */
-        .football-anim {
-            animation: kickFootball 1s ease-out forwards;
-        }
-        @keyframes kickFootball {
-            0% { transform: translateX(-50px) translateY(20px) rotate(0deg); opacity: 0.5; }
-            50% { transform: translateX(20px) translateY(-20px) rotate(180deg); opacity: 1; }
-            100% { transform: translateX(0) translateY(0) rotate(360deg); opacity: 1; }
-        }
-
-        .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; margin-bottom: 15px; text-align: center; }
+        /* Экраны игры */
+        .preview-box { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 100px; margin-bottom: 20px; position: relative; }
         
-        /* Modes */
-        .mode-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 20px; }
-        .mode-card { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 20px; padding: 12px 5px; cursor: pointer; transition: 0.3s; }
-        .mode-card.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 136, 204, 0.4); }
-        .mode-card span { display: block; font-size: 22px; }
-        .mode-card p { margin: 5px 0 0 0; font-size: 10px; font-weight: bold; opacity: 0.8; }
+        /* Анимации как в ТГ */
+        .roll-anim { animation: roll 0.6s infinite linear; }
+        @keyframes roll { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
 
-        .btn-play { background: white; color: black; border: none; padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 800; width: 100%; margin-top: 25px; transition: 0.2s; }
-        .btn-play:active { transform: scale(0.96); }
+        .jump-anim { animation: jump 0.5s infinite ease-in-out; }
+        @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
 
-        /* Stats & Widgets */
-        .stat-row { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
-        .stat-box { background: var(--glass); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .stat-val { display: block; font-size: 22px; font-weight: 800; color: var(--accent); }
-        .stat-label { font-size: 10px; opacity: 0.5; text-transform: uppercase; }
+        .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; text-align: center; }
+        .mode-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin: 20px 0; }
+        .mode-card { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 20px; padding: 12px 5px; cursor: pointer; }
+        .mode-card.active { background: var(--accent); border-color: var(--accent); }
+        
+        .btn-play { background: white; color: black; border: none; padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 800; width: 100%; transition: 0.2s; }
+        .btn-play:disabled { opacity: 0.5; }
 
-        /* Widget Bar */
-        .widget-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85%; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 35px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .tab-item { color: rgba(255,255,255,0.3); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .widget-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85%; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 35px; display: flex; justify-content: space-around; padding: 12px 0; }
+        .tab-item { color: rgba(255,255,255,0.3); flex: 1; text-align: center; font-size: 22px; }
         .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 22px; }
     </style>
 </head>
 <body>
@@ -132,135 +61,111 @@
             <span id="user_name" style="font-weight: 700;">Player</span>
         </div>
         <div class="balance-badge">
-            <span id="balance_val">100</span>
-            <span style="color: #ffd700;">💎</span>
-            <button class="add-btn" onclick="tg.showAlert('Магазин откроется в следующем обновлении!')">+</button>
+            <span id="balance_val">100</span><span>💎</span>
+            <button class="add-btn">+</button>
         </div>
     </div>
 
     <div class="content">
         <div id="gamba-page" class="page active">
-            <div class="preview-box" id="mode-preview">🎲</div>
+            <div class="preview-box" id="game-emoji">🎲</div>
             
             <div class="glass-card">
-                <h2 id="mode-title" style="margin: 0;">Dice Clash</h2>
-                <p style="opacity: 0.5; font-size: 13px;">Минимальная ставка: 10 💎</p>
-
+                <h2 id="mode-label" style="margin: 0;">Dice Duel</h2>
                 <div class="mode-selector">
-                    <div class="mode-card active" onclick="updateMode('dice', '🎲', 'Dice Clash', this)">
-                        <span>🎲</span><p>КУБ</p>
-                    </div>
-                    <div class="mode-card" onclick="updateMode('basket', '🏀', 'Basket Shot', this)">
-                        <span>🏀</span><p>БАСКЕТ</p>
-                    </div>
-                    <div class="mode-card" onclick="updateMode('football', '⚽', 'Goal Kick', this)">
-                        <span>⚽</span><p>ФУТБОЛ</p>
-                    </div>
+                    <div class="mode-card active" onclick="changeMode('dice', '🎲', 'Dice Duel', this)"><span>🎲</span><p style="font-size: 9px; margin: 5px 0 0;">КУБ</p></div>
+                    <div class="mode-card" onclick="changeMode('basket', '🏀', 'Basket Shot', this)"><span>🏀</span><p style="font-size: 9px; margin: 5px 0 0;">БАСКЕТ</p></div>
+                    <div class="mode-card" onclick="changeMode('football', '⚽', 'Goal Kick', this)"><span>⚽</span><p style="font-size: 9px; margin: 5px 0 0;">ФУТБОЛ</p></div>
                 </div>
-
-                <button class="btn-play" onclick="startSearch()">ИГРАТЬ</button>
+                <button class="btn-play" id="play-btn" onclick="runGame()">ИГРАТЬ (10 💎)</button>
             </div>
         </div>
 
         <div id="bonus-page" class="page">
-            <div class="glass-card" style="text-align: left;">
-                <h3>Задания</h3>
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px;">
-                    <span>Подписка на канал</span>
-                    <button style="background: var(--accent); border: none; color: white; border-radius: 10px; padding: 8px 15px;" onclick="tg.showAlert('Проверка...')">+100</button>
-                </div>
-            </div>
-            
-            <div class="glass-card" style="text-align: left;">
-                <h3>Рефералы</h3>
-                <p style="opacity: 0.6; font-size: 14px;">Приглашай друзей и забирай по 50 💎 за каждого!</p>
-                <button class="btn-play" style="background: var(--glass); color: white;" onclick="copyLink()">ПРИГЛАСИТЬ</button>
-            </div>
+            <div class="glass-card"><h3>🎁 Бонусы</h3><p>Скоро здесь будут задания</p></div>
         </div>
 
         <div id="profile-page" class="page">
             <div class="glass-card">
-                <h3 style="margin-top: 0;">Моя Империя</h3>
-                <div class="stat-row">
-                    <div class="stat-box">
-                        <span class="stat-val" id="ref-count">0</span>
-                        <span class="stat-label">Друзей</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-val" id="ref-money" style="color: #00ff88;">0</span>
-                        <span class="stat-label">Доход</span>
-                    </div>
-                </div>
-            </div>
-            <div class="glass-card">
-                <h3 style="margin: 0 0 10px 0;">Статистика</h3>
-                <div class="stat-row">
-                    <div class="stat-box">
-                        <span class="stat-val">0</span>
-                        <span class="stat-label">Побед</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-val">0</span>
-                        <span class="stat-label">Игр</span>
-                    </div>
+                <h3>Профиль</h3>
+                <div style="display: flex; justify-content: space-around; margin-top: 15px;">
+                    <div><span style="display:block; font-size:20px; color:var(--accent);" id="ref-count">0</span><small>РЕФЫ</small></div>
+                    <div><span style="display:block; font-size:20px; color:#00ff88;" id="ref-money">0</span><small>ДОХОД</small></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="widget-bar">
-        <div class="tab-item active" onclick="switchTab('gamba-page', this)">
-            <span class="tab-icon">🕹️</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('bonus-page', this)">
-            <span class="tab-icon">🎁</span>
-        </div>
-        <div class="tab-item" onclick="switchTab('profile-page', this)">
-            <span class="tab-icon">👤</span>
-        </div>
+        <div class="tab-item active" onclick="switchTab('gamba-page', this)">🕹️</div>
+        <div class="tab-item" onclick="switchTab('bonus-page', this)">🎁</div>
+        <div class="tab-item" onclick="switchTab('profile-page', this)">👤</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let friends = 5; // Пример
-        const reward = 50;
+        let currentMode = 'dice';
+        let isPlaying = false;
 
-        // Init Data
-        document.getElementById("ref-count").innerText = friends;
-        document.getElementById("ref-money").innerText = "+" + (friends * reward) + " 💎";
-        
-        const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
-
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            tg.expand();
-            document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
-            if (tg.initDataUnsafe.user.photo_url) document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
-        }
-
-        function updateMode(mode, icon, title, el) {
-            const preview = document.getElementById('mode-preview');
-            
-            // Удаляем старые анимации
-            preview.className = 'preview-box'; 
-            
-            setTimeout(() => { // Запускаем анимацию после очистки
-                preview.innerText = icon;
-                document.getElementById('mode-title').innerText = title;
-
-                // Добавляем новую анимацию
-                if (mode === 'dice') {
-                    preview.classList.add('dice-anim');
-                } else if (mode === 'basket') {
-                    preview.classList.add('basket-anim');
-                } else if (mode === 'football') {
-                    preview.classList.add('football-anim');
-                }
-            }, 50); // Небольшая задержка, чтобы анимация сбросилась
-
+        function changeMode(mode, emoji, label, el) {
+            if (isPlaying) return;
+            currentMode = mode;
+            document.getElementById('game-emoji').innerText = emoji;
+            document.getElementById('mode-label').innerText = label;
             document.querySelectorAll('.mode-card').forEach(m => m.classList.remove('active'));
             el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function runGame() {
+            if (isPlaying) return;
+            isPlaying = true;
+            const emojiEl = document.getElementById('game-emoji');
+            const btn = document.getElementById('play-btn');
+            
             tg.HapticFeedback.impactOccurred('medium');
+            btn.disabled = true;
+            btn.innerText = "БРОСОК...";
+
+            // 1. Запуск анимации ожидания (кручение/прыжки)
+            if (currentMode === 'dice') emojiEl.classList.add('roll-anim');
+            else emojiEl.classList.add('jump-anim');
+
+            // 2. Имитация запроса к серверу (через 2 секунды получаем результат)
+            setTimeout(() => {
+                emojiEl.classList.remove('roll-anim', 'jump-anim');
+                
+                // Генерируем результат (от 1 до 6)
+                const score = Math.floor(Math.random() * 6) + 1;
+                const win = score > 3; // Условная победа если выпало больше 3
+
+                // Показываем результат как в ТГ
+                if (currentMode === 'dice') {
+                    const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+                    emojiEl.innerText = diceFaces[score-1];
+                } else if (currentMode === 'basket') {
+                    emojiEl.innerText = win ? "🗑️" : "❌";
+                } else {
+                    emojiEl.innerText = win ? "🥅" : "🧤";
+                }
+
+                // Уведомление
+                setTimeout(() => {
+                    if (win) {
+                        tg.showAlert("ПОБЕДА! +18 💎");
+                        tg.HapticFeedback.notificationOccurred('success');
+                    } else {
+                        tg.showAlert("ПРОИГРЫШ. Повезет в следующий раз!");
+                        tg.HapticFeedback.notificationOccurred('error');
+                    }
+                    
+                    // Сброс
+                    isPlaying = false;
+                    btn.disabled = false;
+                    btn.innerText = "ИГРАТЬ (10 💎)";
+                }, 500);
+
+            }, 2000);
         }
 
         function switchTab(pageId, el) {
@@ -271,18 +176,13 @@
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        function startSearch() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Поиск соперника начат!");
-        }
-
-        function copyLink() {
-            tg.showAlert("Ссылка скопирована!");
-        }
-
-        // Инициализируем анимацию для первого режима при загрузке
         window.onload = () => {
-            updateMode('dice', '🎲', 'Dice Clash', document.querySelector('.mode-card.active'));
+            const urlParams = new URLSearchParams(window.location.search);
+            document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
+            if (tg.initDataUnsafe.user) {
+                document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
+                if (tg.initDataUnsafe.user.photo_url) document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
+            }
         };
     </script>
 </body>
