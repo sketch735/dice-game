@@ -18,137 +18,51 @@
             background: var(--bg);
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            margin: 0; padding: 0;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Top Bar */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            z-index: 10;
-        }
-
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px; z-index: 10; }
         .user-info { display: flex; align-items: center; gap: 12px; }
-        .user-info img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent); }
-        .premium-border { border-color: var(--premium) !important; box-shadow: 0 0 10px var(--premium); }
+        .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); }
+        .balance-badge { background: var(--glass); backdrop-filter: blur(20px); padding: 10px 18px; border-radius: 25px; border: 1px solid var(--glass-border); font-weight: 800; display: flex; align-items: center; gap: 6px; }
 
-        .balance-badge {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 10px 18px;
-            border-radius: 25px;
-            border: 1px solid var(--glass-border);
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* Pages Area */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 120px;
-        }
-
-        .page {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-
+        .content { flex: 1; overflow-y: auto; padding-bottom: 120px; }
+        .page { display: none; flex-direction: column; align-items: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: flex; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Cards & Widgets */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            padding: 25px;
-            width: 90%;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; margin-bottom: 15px; }
+        
+        /* Режимы игры */
+        .mode-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 15px; }
+        .mode-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 15px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .mode-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.1); transform: scale(1.05); }
+        .mode-card span { display: block; font-size: 24px; margin-bottom: 5px; }
 
-        .btn-action {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: 700;
-            width: 100%;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
+        .btn-action { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 18px; font-size: 18px; font-weight: 800; width: 100%; margin-top: 20px; }
 
-        .btn-action:active { transform: scale(0.97); }
-        .btn-premium { background: linear-gradient(90deg, #ff8800, #ffcc00); color: #000; }
+        /* Профиль и Статы */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .stat-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 18px; border: 1px solid var(--glass-border); text-align: center; }
+        .stat-val { display: block; font-size: 22px; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Profile Specifics */
-        .stats-row { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0; }
-        .stat-box { background: rgba(255,255,255,0.05); flex: 1; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border); }
-        .stat-value { display: block; font-size: 20px; font-weight: 800; color: var(--accent); }
-        .stat-label { font-size: 11px; opacity: 0.5; text-transform: uppercase; }
-
-        .settings-list { width: 100%; text-align: left; }
-        .settings-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 15px 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); 
-        }
-
-        /* Bottom Widget Bar */
-        .widget-bar {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 85%;
-            background: rgba(20, 20, 20, 0.75);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 35px;
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            z-index: 100;
-        }
-
-        .tab-item { color: rgba(255,255,255,0.3); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; }
+        /* Шторка (Widget Bar) */
+        .widget-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 30px; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .tab-item { color: rgba(255,255,255,0.3); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 24px; }
+        .tab-icon { font-size: 20px; }
         .tab-label { font-size: 10px; font-weight: 700; }
-
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <div class="user-info">
-            <img id="user_pic" src="https://via.placeholder.com/42">
-            <div>
-                <span id="user_name" style="font-weight: 700; display: block;">Игрок</span>
-                <span id="user_rank" style="font-size: 10px; color: var(--accent);">Новичок</span>
-            </div>
+            <img id="user_pic" src="https://via.placeholder.com/40">
+            <span id="user_name" style="font-weight: 700;">Загрузка...</span>
         </div>
         <div class="balance-badge">
             <span id="balance_val">0</span>
@@ -159,55 +73,65 @@
     <div class="content">
         <div id="gamba-page" class="page active">
             <div class="glass-card" style="text-align: center;">
-                <span style="font-size: 60px;">🎲</span>
-                <h2 style="margin: 15px 0;">Гамба Арена</h2>
-                <p style="opacity: 0.6; font-size: 14px;">Ставка: 10 💎 | Выигрыш: 18 💎</p>
-                <button class="btn-action" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
+                <h2 id="current-mode-title">Dice Duel</h2>
+                <div class="mode-selector">
+                    <div class="mode-card active" onclick="setMode('dice', '🎲', 'Dice Duel', this)">
+                        <span>🎲</span><font size="1">КУБ</font>
+                    </div>
+                    <div class="mode-card" onclick="setMode('basket', '🏀', 'Basket Shot', this)">
+                        <span>🏀</span><font size="1">БАШКЕТ</font>
+                    </div>
+                    <div class="mode-card" onclick="setMode('football', '⚽', 'Goal Kick', this)">
+                        <span>⚽</span><font size="1">ФУТБОЛ</font>
+                    </div>
+                </div>
+                <button class="btn-action" onclick="startSearch()">ИГРАТЬ (10 💎)</button>
+            </div>
+        </div>
+
+        <div id="bonus-page" class="page">
+            <div class="glass-card">
+                <h3>🎁 Задания</h3>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: bold;">Daily Check-in</div>
+                        <div style="font-size: 12px; opacity: 0.6;">Заходи каждый день</div>
+                    </div>
+                    <button style="background: var(--accent); border: none; color: white; border-radius: 8px; padding: 5px 10px;" onclick="claimBonus()">+5</button>
+                </div>
             </div>
 
             <div class="glass-card">
-                <h3 style="margin-top: 0; font-size: 16px;">🎁 Ежедневный бонус</h3>
-                <p style="font-size: 13px; opacity: 0.7;">Заходи каждый день и получай бесплатные алмазы.</p>
-                <button class="btn-action" style="background: rgba(255,255,255,0.1);" onclick="claimBonus()">ЗАБРАТЬ 5 💎</button>
+                <h3>👫 Рефералы</h3>
+                <p style="font-size: 13px; opacity: 0.6;">Получай по 50 💎 за каждого друга!</p>
+                <button class="btn-action" style="margin-top: 10px; background: rgba(255,255,255,0.1);" onclick="copyLink()">ПРИГЛАСИТЬ ДРУГА</button>
             </div>
         </div>
 
         <div id="profile-page" class="page">
             <div class="glass-card">
-                <h3 style="margin: 0 0 15px 0;">Твои успехи</h3>
-                <div class="stats-row">
-                    <div class="stat-box">
-                        <span class="stat-value">24</span>
-                        <span class="stat-label">Победы</span>
+                <h3>Твои активы</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val" id="ref-count">0</span>
+                        <span class="stat-label">Рефералы</span>
                     </div>
-                    <div class="stat-box">
-                        <span class="stat-value">65%</span>
-                        <span class="stat-label">Winrate</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-value">1.2k</span>
-                        <span class="stat-label">Опыт</span>
+                    <div class="stat-item">
+                        <span class="stat-val" id="ref-earnings" style="color: #00ff88;">0</span>
+                        <span class="stat-label">Доход (💎)</span>
                     </div>
                 </div>
-                <button class="btn-action btn-premium" onclick="tg.showAlert('Premium дает +20% к выигрышу!')">💎 КУПИТЬ PREMIUM</button>
             </div>
-
             <div class="glass-card">
-                <div class="settings-list">
-                    <div class="settings-item" onclick="tg.showAlert('Твоя ссылка скопирована!')">
-                        <span>👫 Рефералы</span>
-                        <span style="color: var(--accent);">+50 💎</span>
+                <h3 style="margin-top: 0;">Статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val">0</span>
+                        <span class="stat-label">Победы</span>
                     </div>
-                    <div class="settings-item">
-                        <span>🔊 Звуки в игре</span>
-                        <input type="checkbox" checked>
-                    </div>
-                    <div class="settings-item">
-                        <span>🌙 Темная тема</span>
-                        <input type="checkbox" checked disabled>
-                    </div>
-                    <div class="settings-item" style="border: none; color: #ff4444;" onclick="tg.close()">
-                        <span>🚪 Выйти из игры</span>
+                    <div class="stat-item">
+                        <span class="stat-val">0</span>
+                        <span class="stat-label">Игры</span>
                     </div>
                 </div>
             </div>
@@ -219,6 +143,10 @@
             <span class="tab-icon">🎮</span>
             <span class="tab-label">Гамба</span>
         </div>
+        <div class="tab-item" onclick="switchTab('bonus-page', this)">
+            <span class="tab-icon">🎁</span>
+            <span class="tab-label">Бонусы</span>
+        </div>
         <div class="tab-item" onclick="switchTab('profile-page', this)">
             <span class="tab-icon">👤</span>
             <span class="tab-label">Профиль</span>
@@ -227,20 +155,29 @@
 
     <script>
         let tg = window.Telegram.WebApp;
-        
-        // Настройка данных
+        let invitedFriends = 3; // Для примера, потом будет из базы
+        const bonusPerFriend = 50;
+
+        // Инициализация данных
+        document.getElementById("ref-count").innerText = invitedFriends;
+        document.getElementById("ref-earnings").innerText = "+" + (invitedFriends * bonusPerFriend);
+
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             tg.expand();
             document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
-            if (tg.initDataUnsafe.user.photo_url) {
-                document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
-            }
+            if (tg.initDataUnsafe.user.photo_url) document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
         } else {
             document.getElementById("user_name").innerText = "Dev Mode";
-            document.getElementById("balance_val").innerText = "999";
+        }
+
+        function setMode(mode, icon, title, el) {
+            document.getElementById('current-mode-title').innerText = title;
+            document.querySelectorAll('.mode-card').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         function switchTab(pageId, el) {
@@ -248,17 +185,20 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function copyLink() {
+            tg.showAlert("Ссылка для друзей скопирована!");
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
         function claimBonus() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Вы получили ежедневный бонус: 5 💎");
+            tg.showAlert("Вы получили бонус!");
         }
 
         function startSearch() {
-            tg.HapticFeedback.impactOccurred('light');
-            tg.showAlert("Поиск противника...");
+            tg.showAlert("Поиск соперника...");
         }
     </script>
 </body>
