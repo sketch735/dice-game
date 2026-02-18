@@ -48,10 +48,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Страницы */
+        /* Контент страниц */
         .page {
             display: none;
             flex-direction: column;
@@ -59,14 +58,15 @@
             justify-content: center;
             flex: 1;
             padding: 20px;
-            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            padding-bottom: 100px; /* Отступ под шторку */
+            animation: slideUp 0.3s ease-out;
         }
 
         .page.active { display: flex; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Карточка Арены */
+        /* Карточка Гамбы */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(25px);
@@ -76,8 +76,7 @@
             padding: 40px 30px;
             width: 85%;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
         .btn-main {
@@ -86,56 +85,66 @@
             border: none;
             padding: 20px;
             border-radius: 20px;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             width: 100%;
             margin-top: 25px;
             box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
-            transition: 0.2s;
+            transition: transform 0.1s;
         }
 
-        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-main:active { transform: scale(0.96); }
 
-        /* Анимация поиска */
-        .searching-loader {
-            display: none;
-            width: 60px;
-            height: 60px;
-            border: 5px solid var(--glass);
-            border-top: 5px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Нижнее меню */
-        .tab-bar {
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border-top: 1px solid var(--glass-border);
+        /* Нижняя стеклянная шторка (Widget Bar) */
+        .widget-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            background: rgba(25, 25, 25, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 35px 0;
+            padding: 10px 0;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .tab-item {
-            color: #555;
+            color: rgba(255,255,255,0.4);
             text-align: center;
-            font-size: 10px;
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             transition: 0.3s;
+            cursor: pointer;
         }
 
         .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 26px; }
+        .tab-icon { font-size: 22px; }
+        .tab-label { font-size: 11px; font-weight: 600; }
 
+        /* Профиль элементы */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
     </style>
 </head>
 <body>
@@ -143,75 +152,63 @@
     <div class="top-bar">
         <div class="user-info">
             <img id="user_pic" src="https://via.placeholder.com/40">
-            <span id="user_name" style="font-weight: 600; font-size: 18px;">Игрок</span>
+            <span id="user_name" style="font-weight: 600;">Игрок</span>
         </div>
         <div class="balance-badge">
-            <span id="balance_val">...</span>
-            <span style="color: #ffd700; font-size: 18px;">💎</span>
+            <span id="balance_val">100</span>
+            <span style="color: #ffd700;">💎</span>
         </div>
     </div>
 
-    <div id="game-page" class="page active">
-        <div class="glass-card" id="main-card">
-            <div id="card-content">
-                <span style="font-size: 60px;">⚔️</span>
-                <h2 style="margin: 15px 0 5px 0;">Дуэльный Клуб</h2>
-                <p style="opacity: 0.5; margin-bottom: 25px;">Ставка: 10 поинтов</p>
-                <button class="btn-main" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
-            </div>
-            <div id="search-content" style="display: none;">
-                <div class="searching-loader"></div>
-                <h3>ПОИСК СОПЕРНИКА</h3>
-                <p style="opacity: 0.5;">Среднее время ожидания: 5с</p>
-                <button class="btn-main" style="background: rgba(255,0,0,0.2);" onclick="stopSearch()">ОТМЕНА</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="stats-page" class="page">
+    <div id="gamba-page" class="page active">
         <div class="glass-card">
-            <span style="font-size: 50px;">🏆</span>
-            <h2>Рейтинг</h2>
-            <p style="opacity: 0.5;">Ты на 142 месте</p>
-            <div style="text-align: left; margin-top: 20px; opacity: 0.8;">
-                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
-                    <span>1. Shark_SAMP</span>
-                    <span>15,400 💎</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
-                    <span>2. Admin_Bot</span>
-                    <span>12,100 💎</span>
-                </div>
-            </div>
+            <span style="font-size: 60px;">⚔️</span>
+            <h2 style="margin: 15px 0;">Дуэльный Клуб</h2>
+            <p style="opacity: 0.5;">Ставка: 10 поинтов</p>
+            <button class="btn-main" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
         </div>
     </div>
 
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('game-page', this)">
-            <span class="tab-icon">⚔️</span>
-            <span>Арена</span>
+    <div id="profile-page" class="page">
+        <div class="glass-card">
+            <h2 style="margin-bottom: 20px;">Твои Данные</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div style="font-size: 20px;">🏆</div>
+                    <div style="font-size: 12px; opacity: 0.6;">Победы</div>
+                    <div style="font-weight: bold;">0</div>
+                </div>
+                <div class="stat-item">
+                    <div style="font-size: 20px;">🎲</div>
+                    <div style="font-size: 12px; opacity: 0.6;">Игр</div>
+                    <div style="font-weight: bold;">0</div>
+                </div>
+            </div>
+            <button class="btn-main" style="background: var(--glass); margin-top: 30px;" onclick="tg.showAlert('Рефералы скоро!')">👫 ПРИГЛАСИТЬ ДРУГА</button>
         </div>
-        <div class="tab-item" onclick="switchTab('stats-page', this)">
-            <span class="tab-icon">🏆</span>
-            <span>Топ</span>
+    </div>
+
+    <div class="widget-bar">
+        <div class="tab-item active" onclick="switchTab('gamba-page', this)">
+            <span class="tab-icon">🕹️</span>
+            <span class="tab-label">Гамба</span>
         </div>
-        <div class="tab-item" onclick="tg.close()">
-            <span class="tab-icon">🚪</span>
-            <span>Выход</span>
+        <div class="tab-item" onclick="switchTab('profile-page', this)">
+            <span class="tab-icon">👤</span>
+            <span class="tab-label">Профиль</span>
         </div>
-    </nav>
+    </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        // Загрузка баланса из URL
+        // Баланс из URL
         const urlParams = new URLSearchParams(window.location.search);
-        const userBalance = urlParams.get('balance');
-        document.getElementById("balance_val").innerText = userBalance || "100";
+        document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
 
-        // Данные юзера
+        // Данные из TG
         if (tg.initDataUnsafe.user) {
             document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
             if (tg.initDataUnsafe.user.photo_url) {
@@ -222,21 +219,16 @@
         function switchTab(pageId, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
+            
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
         function startSearch() {
-            tg.HapticFeedback.impactOccurred('medium');
-            document.getElementById('card-content').style.display = 'none';
-            document.getElementById('search-content').style.display = 'block';
-            document.querySelector('.searching-loader').style.display = 'block';
-        }
-
-        function stopSearch() {
-            document.getElementById('card-content').style.display = 'block';
-            document.getElementById('search-content').style.display = 'none';
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Ищем живого соперника...");
         }
     </script>
 </body>
