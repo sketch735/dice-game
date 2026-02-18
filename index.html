@@ -10,6 +10,7 @@
             --glass: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.12);
             --accent: #0088cc;
+            --premium: #ffaa00;
             --bg: #050505;
         }
 
@@ -25,7 +26,7 @@
             overflow: hidden;
         }
 
-        /* Верхняя панель */
+        /* Top Bar */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -35,7 +36,8 @@
         }
 
         .user-info { display: flex; align-items: center; gap: 12px; }
-        .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); }
+        .user-info img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent); }
+        .premium-border { border-color: var(--premium) !important; box-shadow: 0 0 10px var(--premium); }
 
         .balance-badge {
             background: var(--glass);
@@ -44,153 +46,177 @@
             padding: 10px 18px;
             border-radius: 25px;
             border: 1px solid var(--glass-border);
-            font-weight: bold;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        /* Контент страниц */
+        /* Pages Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 120px;
+        }
+
         .page {
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            flex: 1;
             padding: 20px;
-            padding-bottom: 100px; /* Отступ под шторку */
-            animation: slideUp 0.3s ease-out;
+            animation: fadeIn 0.3s ease;
         }
 
         .page.active { display: flex; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Карточка Гамбы */
+        /* Cards & Widgets */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
-            border-radius: 35px;
-            padding: 40px 30px;
-            width: 85%;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-
-        .btn-main {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 20px;
-            font-size: 20px;
-            font-weight: 800;
-            width: 100%;
-            margin-top: 25px;
-            box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
-            transition: transform 0.1s;
-        }
-
-        .btn-main:active { transform: scale(0.96); }
-
-        /* Нижняя стеклянная шторка (Widget Bar) */
-        .widget-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            border-radius: 30px;
+            padding: 25px;
             width: 90%;
-            background: rgba(25, 25, 25, 0.7);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 25px;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
+            margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .tab-item {
-            color: rgba(255,255,255,0.4);
-            text-align: center;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 22px; }
-        .tab-label { font-size: 11px; font-weight: 600; }
-
-        /* Профиль элементы */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            background: var(--glass);
+        .btn-action {
+            background: var(--accent);
+            color: white;
+            border: none;
             padding: 15px;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.2s;
         }
+
+        .btn-action:active { transform: scale(0.97); }
+        .btn-premium { background: linear-gradient(90deg, #ff8800, #ffcc00); color: #000; }
+
+        /* Profile Specifics */
+        .stats-row { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0; }
+        .stat-box { background: rgba(255,255,255,0.05); flex: 1; padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--glass-border); }
+        .stat-value { display: block; font-size: 20px; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 11px; opacity: 0.5; text-transform: uppercase; }
+
+        .settings-list { width: 100%; text-align: left; }
+        .settings-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 0; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+
+        /* Bottom Widget Bar */
+        .widget-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            background: rgba(20, 20, 20, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+
+        .tab-item { color: rgba(255,255,255,0.3); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; }
+        .tab-item.active { color: var(--accent); }
+        .tab-icon { font-size: 24px; }
+        .tab-label { font-size: 10px; font-weight: 700; }
+
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <div class="user-info">
-            <img id="user_pic" src="https://via.placeholder.com/40">
-            <span id="user_name" style="font-weight: 600;">Игрок</span>
+            <img id="user_pic" src="https://via.placeholder.com/42">
+            <div>
+                <span id="user_name" style="font-weight: 700; display: block;">Игрок</span>
+                <span id="user_rank" style="font-size: 10px; color: var(--accent);">Новичок</span>
+            </div>
         </div>
         <div class="balance-badge">
-            <span id="balance_val">100</span>
+            <span id="balance_val">0</span>
             <span style="color: #ffd700;">💎</span>
         </div>
     </div>
 
-    <div id="gamba-page" class="page active">
-        <div class="glass-card">
-            <span style="font-size: 60px;">⚔️</span>
-            <h2 style="margin: 15px 0;">Дуэльный Клуб</h2>
-            <p style="opacity: 0.5;">Ставка: 10 поинтов</p>
-            <button class="btn-main" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
-        </div>
-    </div>
+    <div class="content">
+        <div id="gamba-page" class="page active">
+            <div class="glass-card" style="text-align: center;">
+                <span style="font-size: 60px;">🎲</span>
+                <h2 style="margin: 15px 0;">Гамба Арена</h2>
+                <p style="opacity: 0.6; font-size: 14px;">Ставка: 10 💎 | Выигрыш: 18 💎</p>
+                <button class="btn-action" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
+            </div>
 
-    <div id="profile-page" class="page">
-        <div class="glass-card">
-            <h2 style="margin-bottom: 20px;">Твои Данные</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div style="font-size: 20px;">🏆</div>
-                    <div style="font-size: 12px; opacity: 0.6;">Победы</div>
-                    <div style="font-weight: bold;">0</div>
+            <div class="glass-card">
+                <h3 style="margin-top: 0; font-size: 16px;">🎁 Ежедневный бонус</h3>
+                <p style="font-size: 13px; opacity: 0.7;">Заходи каждый день и получай бесплатные алмазы.</p>
+                <button class="btn-action" style="background: rgba(255,255,255,0.1);" onclick="claimBonus()">ЗАБРАТЬ 5 💎</button>
+            </div>
+        </div>
+
+        <div id="profile-page" class="page">
+            <div class="glass-card">
+                <h3 style="margin: 0 0 15px 0;">Твои успехи</h3>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-value">24</span>
+                        <span class="stat-label">Победы</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">65%</span>
+                        <span class="stat-label">Winrate</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">1.2k</span>
+                        <span class="stat-label">Опыт</span>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div style="font-size: 20px;">🎲</div>
-                    <div style="font-size: 12px; opacity: 0.6;">Игр</div>
-                    <div style="font-weight: bold;">0</div>
+                <button class="btn-action btn-premium" onclick="tg.showAlert('Premium дает +20% к выигрышу!')">💎 КУПИТЬ PREMIUM</button>
+            </div>
+
+            <div class="glass-card">
+                <div class="settings-list">
+                    <div class="settings-item" onclick="tg.showAlert('Твоя ссылка скопирована!')">
+                        <span>👫 Рефералы</span>
+                        <span style="color: var(--accent);">+50 💎</span>
+                    </div>
+                    <div class="settings-item">
+                        <span>🔊 Звуки в игре</span>
+                        <input type="checkbox" checked>
+                    </div>
+                    <div class="settings-item">
+                        <span>🌙 Темная тема</span>
+                        <input type="checkbox" checked disabled>
+                    </div>
+                    <div class="settings-item" style="border: none; color: #ff4444;" onclick="tg.close()">
+                        <span>🚪 Выйти из игры</span>
+                    </div>
                 </div>
             </div>
-            <button class="btn-main" style="background: var(--glass); margin-top: 30px;" onclick="tg.showAlert('Рефералы скоро!')">👫 ПРИГЛАСИТЬ ДРУГА</button>
         </div>
     </div>
 
     <div class="widget-bar">
         <div class="tab-item active" onclick="switchTab('gamba-page', this)">
-            <span class="tab-icon">🕹️</span>
+            <span class="tab-icon">🎮</span>
             <span class="tab-label">Гамба</span>
         </div>
         <div class="tab-item" onclick="switchTab('profile-page', this)">
@@ -201,34 +227,38 @@
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-
-        // Баланс из URL
+        
+        // Настройка данных
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
 
-        // Данные из TG
-        if (tg.initDataUnsafe.user) {
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            tg.expand();
             document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
             if (tg.initDataUnsafe.user.photo_url) {
                 document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
             }
+        } else {
+            document.getElementById("user_name").innerText = "Dev Mode";
+            document.getElementById("balance_val").innerText = "999";
         }
 
         function switchTab(pageId, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            
-            tg.HapticFeedback.impactOccurred('medium');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function claimBonus() {
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Вы получили ежедневный бонус: 5 💎");
         }
 
         function startSearch() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Ищем живого соперника...");
+            tg.HapticFeedback.impactOccurred('light');
+            tg.showAlert("Поиск противника...");
         }
     </script>
 </body>
