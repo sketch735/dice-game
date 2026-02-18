@@ -10,7 +10,6 @@
             --glass: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.12);
             --accent: #0088cc;
-            --premium: #ffaa00;
             --bg: #050505;
         }
 
@@ -18,43 +17,86 @@
             background: var(--bg);
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0;
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+            margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
+        /* Top Bar */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px; z-index: 10; }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); }
-        .balance-badge { background: var(--glass); backdrop-filter: blur(20px); padding: 10px 18px; border-radius: 25px; border: 1px solid var(--glass-border); font-weight: 800; display: flex; align-items: center; gap: 6px; }
 
+        .balance-badge {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            padding: 8px 12px 8px 15px;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Content */
         .content { flex: 1; overflow-y: auto; padding-bottom: 120px; }
         .page { display: none; flex-direction: column; align-items: center; padding: 20px; animation: fadeIn 0.3s ease; }
         .page.active { display: flex; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; margin-bottom: 15px; }
+        /* Preview Area */
+        .preview-box {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 20px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bounce { animation: bounce 2s infinite; }
+        @keyframes bounce { 
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; margin-bottom: 15px; text-align: center; }
         
-        /* Режимы игры */
-        .mode-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 15px; }
-        .mode-card { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 15px; padding: 15px 5px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .mode-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.1); transform: scale(1.05); }
-        .mode-card span { display: block; font-size: 24px; margin-bottom: 5px; }
+        /* Modes */
+        .mode-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-top: 20px; }
+        .mode-card { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 20px; padding: 12px 5px; cursor: pointer; transition: 0.3s; }
+        .mode-card.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 136, 204, 0.4); }
+        .mode-card span { display: block; font-size: 22px; }
+        .mode-card p { margin: 5px 0 0 0; font-size: 10px; font-weight: bold; opacity: 0.8; }
 
-        .btn-action { background: var(--accent); color: white; border: none; padding: 18px; border-radius: 18px; font-size: 18px; font-weight: 800; width: 100%; margin-top: 20px; }
+        .btn-play { background: white; color: black; border: none; padding: 18px; border-radius: 20px; font-size: 18px; font-weight: 800; width: 100%; margin-top: 25px; transition: 0.2s; }
+        .btn-play:active { transform: scale(0.96); }
 
-        /* Профиль и Статы */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-        .stat-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 18px; border: 1px solid var(--glass-border); text-align: center; }
+        /* Stats & Widgets */
+        .stat-row { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+        .stat-box { background: var(--glass); flex: 1; padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); }
         .stat-val { display: block; font-size: 22px; font-weight: 800; color: var(--accent); }
-        .stat-label { font-size: 10px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-label { font-size: 10px; opacity: 0.5; text-transform: uppercase; }
 
-        /* Шторка (Widget Bar) */
-        .widget-bar { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 30px; display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        /* Widget Bar */
+        .widget-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85%; background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 35px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
         .tab-item { color: rgba(255,255,255,0.3); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .tab-item.active { color: var(--accent); }
-        .tab-icon { font-size: 20px; }
-        .tab-label { font-size: 10px; font-weight: 700; }
+        .tab-icon { font-size: 22px; }
     </style>
 </head>
 <body>
@@ -62,76 +104,79 @@
     <div class="top-bar">
         <div class="user-info">
             <img id="user_pic" src="https://via.placeholder.com/40">
-            <span id="user_name" style="font-weight: 700;">Загрузка...</span>
+            <span id="user_name" style="font-weight: 700;">Player</span>
         </div>
         <div class="balance-badge">
-            <span id="balance_val">0</span>
+            <span id="balance_val">100</span>
             <span style="color: #ffd700;">💎</span>
+            <button class="add-btn" onclick="tg.showAlert('Магазин откроется в следующем обновлении!')">+</button>
         </div>
     </div>
 
     <div class="content">
         <div id="gamba-page" class="page active">
-            <div class="glass-card" style="text-align: center;">
-                <h2 id="current-mode-title">Dice Duel</h2>
+            <div class="preview-box bounce" id="mode-preview">🎲</div>
+            
+            <div class="glass-card">
+                <h2 id="mode-title" style="margin: 0;">Dice Clash</h2>
+                <p style="opacity: 0.5; font-size: 13px;">Минимальная ставка: 10 💎</p>
+
                 <div class="mode-selector">
-                    <div class="mode-card active" onclick="setMode('dice', '🎲', 'Dice Duel', this)">
-                        <span>🎲</span><font size="1">КУБ</font>
+                    <div class="mode-card active" onclick="updateMode('dice', '🎲', 'Dice Clash', this)">
+                        <span>🎲</span><p>КУБ</p>
                     </div>
-                    <div class="mode-card" onclick="setMode('basket', '🏀', 'Basket Shot', this)">
-                        <span>🏀</span><font size="1">БАШКЕТ</font>
+                    <div class="mode-card" onclick="updateMode('basket', '🏀', 'Basket Shot', this)">
+                        <span>🏀</span><p>БАСКЕТ</p>
                     </div>
-                    <div class="mode-card" onclick="setMode('football', '⚽', 'Goal Kick', this)">
-                        <span>⚽</span><font size="1">ФУТБОЛ</font>
+                    <div class="mode-card" onclick="updateMode('football', '⚽', 'Goal Kick', this)">
+                        <span>⚽</span><p>ФУТБОЛ</p>
                     </div>
                 </div>
-                <button class="btn-action" onclick="startSearch()">ИГРАТЬ (10 💎)</button>
+
+                <button class="btn-play" onclick="startSearch()">ИГРАТЬ</button>
             </div>
         </div>
 
         <div id="bonus-page" class="page">
-            <div class="glass-card">
-                <h3>🎁 Задания</h3>
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-weight: bold;">Daily Check-in</div>
-                        <div style="font-size: 12px; opacity: 0.6;">Заходи каждый день</div>
-                    </div>
-                    <button style="background: var(--accent); border: none; color: white; border-radius: 8px; padding: 5px 10px;" onclick="claimBonus()">+5</button>
+            <div class="glass-card" style="text-align: left;">
+                <h3>Задания</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px;">
+                    <span>Подписка на канал</span>
+                    <button style="background: var(--accent); border: none; color: white; border-radius: 10px; padding: 8px 15px;" onclick="tg.showAlert('Проверка...')">+100</button>
                 </div>
             </div>
-
-            <div class="glass-card">
-                <h3>👫 Рефералы</h3>
-                <p style="font-size: 13px; opacity: 0.6;">Получай по 50 💎 за каждого друга!</p>
-                <button class="btn-action" style="margin-top: 10px; background: rgba(255,255,255,0.1);" onclick="copyLink()">ПРИГЛАСИТЬ ДРУГА</button>
+            
+            <div class="glass-card" style="text-align: left;">
+                <h3>Рефералы</h3>
+                <p style="opacity: 0.6; font-size: 14px;">Приглашай друзей и забирай по 50 💎 за каждого!</p>
+                <button class="btn-play" style="background: var(--glass); color: white;" onclick="copyLink()">ПРИГЛАСИТЬ</button>
             </div>
         </div>
 
         <div id="profile-page" class="page">
             <div class="glass-card">
-                <h3>Твои активы</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
+                <h3 style="margin-top: 0;">Моя Империя</h3>
+                <div class="stat-row">
+                    <div class="stat-box">
                         <span class="stat-val" id="ref-count">0</span>
-                        <span class="stat-label">Рефералы</span>
+                        <span class="stat-label">Друзей</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-val" id="ref-earnings" style="color: #00ff88;">0</span>
-                        <span class="stat-label">Доход (💎)</span>
+                    <div class="stat-box">
+                        <span class="stat-val" id="ref-money" style="color: #00ff88;">0</span>
+                        <span class="stat-label">Доход</span>
                     </div>
                 </div>
             </div>
             <div class="glass-card">
-                <h3 style="margin-top: 0;">Статистика</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
+                <h3 style="margin: 0 0 10px 0;">Статистика</h3>
+                <div class="stat-row">
+                    <div class="stat-box">
                         <span class="stat-val">0</span>
-                        <span class="stat-label">Победы</span>
+                        <span class="stat-label">Побед</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-box">
                         <span class="stat-val">0</span>
-                        <span class="stat-label">Игры</span>
+                        <span class="stat-label">Игр</span>
                     </div>
                 </div>
             </div>
@@ -140,28 +185,25 @@
 
     <div class="widget-bar">
         <div class="tab-item active" onclick="switchTab('gamba-page', this)">
-            <span class="tab-icon">🎮</span>
-            <span class="tab-label">Гамба</span>
+            <span class="tab-icon">🕹️</span>
         </div>
         <div class="tab-item" onclick="switchTab('bonus-page', this)">
             <span class="tab-icon">🎁</span>
-            <span class="tab-label">Бонусы</span>
         </div>
         <div class="tab-item" onclick="switchTab('profile-page', this)">
             <span class="tab-icon">👤</span>
-            <span class="tab-label">Профиль</span>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let invitedFriends = 3; // Для примера, потом будет из базы
-        const bonusPerFriend = 50;
+        let friends = 5; // Пример
+        const reward = 50;
 
-        // Инициализация данных
-        document.getElementById("ref-count").innerText = invitedFriends;
-        document.getElementById("ref-earnings").innerText = "+" + (invitedFriends * bonusPerFriend);
-
+        // Init Data
+        document.getElementById("ref-count").innerText = friends;
+        document.getElementById("ref-money").innerText = "+" + (friends * reward) + " 💎";
+        
         const urlParams = new URLSearchParams(window.location.search);
         document.getElementById("balance_val").innerText = urlParams.get('balance') || "100";
 
@@ -169,15 +211,21 @@
             tg.expand();
             document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
             if (tg.initDataUnsafe.user.photo_url) document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
-        } else {
-            document.getElementById("user_name").innerText = "Dev Mode";
         }
 
-        function setMode(mode, icon, title, el) {
-            document.getElementById('current-mode-title').innerText = title;
+        function updateMode(mode, icon, title, el) {
+            const preview = document.getElementById('mode-preview');
+            preview.style.transform = 'scale(0)';
+            
+            setTimeout(() => {
+                preview.innerText = icon;
+                document.getElementById('mode-title').innerText = title;
+                preview.style.transform = 'scale(1)';
+            }, 200);
+
             document.querySelectorAll('.mode-card').forEach(m => m.classList.remove('active'));
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
         function switchTab(pageId, el) {
@@ -185,20 +233,16 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function copyLink() {
-            tg.showAlert("Ссылка для друзей скопирована!");
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function claimBonus() {
-            tg.showAlert("Вы получили бонус!");
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         function startSearch() {
-            tg.showAlert("Поиск соперника...");
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Поиск соперника начат!");
+        }
+
+        function copyLink() {
+            tg.showAlert("Ссылка скопирована!");
         }
     </script>
 </body>
