@@ -2,128 +2,242 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DICE CLASH</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --accent: #0088cc;
+            --bg: #050505;
+        }
+
         body {
-            background: radial-gradient(circle, #1a1a2e 0%, #16213e 100%);
+            background: var(--bg);
             color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100vh;
             overflow: hidden;
         }
 
-        .header {
-            margin-top: 30px;
-            text-align: center;
+        /* Верхняя панель */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
         }
 
-        .user-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid #00d2ff;
-            box-shadow: 0 0 15px #00d2ff;
-            margin-bottom: 10px;
-        }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info img { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--accent); }
 
-        .balance-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            padding: 20px 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .balance-amount {
-            font-size: 32px;
+        .balance-badge {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid var(--glass-border);
             font-weight: bold;
-            color: #00d2ff;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .main-menu {
-            display: grid;
-            gap: 15px;
-            width: 80%;
-            max-width: 300px;
+        /* Страницы */
+        .page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 20px;
+            animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .btn {
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
+        .page.active { display: flex; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Карточка Арены */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 35px;
+            padding: 40px 30px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .btn-main {
+            background: var(--accent);
             color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .status-tag {
-            font-size: 12px;
-            background: #3a7bd5;
-            padding: 4px 10px;
+            border: none;
+            padding: 20px;
             border-radius: 20px;
-            margin-top: 5px;
-            display: inline-block;
+            font-size: 18px;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3);
+            transition: 0.2s;
         }
+
+        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
+
+        /* Анимация поиска */
+        .searching-loader {
+            display: none;
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--glass);
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Нижнее меню */
+        .tab-bar {
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 35px 0;
+        }
+
+        .tab-item {
+            color: #555;
+            text-align: center;
+            font-size: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        .tab-item.active { color: var(--accent); }
+        .tab-icon { font-size: 26px; }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <img id="user_photo" src="https://via.placeholder.com/80" class="user-avatar" alt="Ava">
-        <h2 id="user_name">Загрузка...</h2>
-        <span class="status-tag">ИГРОК</span>
+    <div class="top-bar">
+        <div class="user-info">
+            <img id="user_pic" src="https://via.placeholder.com/40">
+            <span id="user_name" style="font-weight: 600; font-size: 18px;">Игрок</span>
+        </div>
+        <div class="balance-badge">
+            <span id="balance_val">...</span>
+            <span style="color: #ffd700; font-size: 18px;">💎</span>
+        </div>
     </div>
 
-    <div class="balance-card">
-        <span style="font-size: 14px; opacity: 0.7;">ТВОЙ БАЛАНС</span>
-        <span class="balance-amount" id="balance">100 💎</span>
+    <div id="game-page" class="page active">
+        <div class="glass-card" id="main-card">
+            <div id="card-content">
+                <span style="font-size: 60px;">⚔️</span>
+                <h2 style="margin: 15px 0 5px 0;">Дуэльный Клуб</h2>
+                <p style="opacity: 0.5; margin-bottom: 25px;">Ставка: 10 поинтов</p>
+                <button class="btn-main" onclick="startSearch()">НАЙТИ ДУЭЛЬ</button>
+            </div>
+            <div id="search-content" style="display: none;">
+                <div class="searching-loader"></div>
+                <h3>ПОИСК СОПЕРНИКА</h3>
+                <p style="opacity: 0.5;">Среднее время ожидания: 5с</p>
+                <button class="btn-main" style="background: rgba(255,0,0,0.2);" onclick="stopSearch()">ОТМЕНА</button>
+            </div>
+        </div>
     </div>
 
-    <div class="main-menu">
-        <button class="btn" onclick="tg.showAlert('Поиск соперника скоро будет доступен!')">⚔️ НАЙТИ ДУЭЛЬ</button>
-        <button class="btn btn-secondary" onclick="tg.showAlert('Топ игроков в разработке')">🏆 РЕЙТИНГ</button>
-        <button class="btn btn-secondary" onclick="tg.close()">ВЫХОД</button>
+    <div id="stats-page" class="page">
+        <div class="glass-card">
+            <span style="font-size: 50px;">🏆</span>
+            <h2>Рейтинг</h2>
+            <p style="opacity: 0.5;">Ты на 142 месте</p>
+            <div style="text-align: left; margin-top: 20px; opacity: 0.8;">
+                <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--glass-border);">
+                    <span>1. Shark_SAMP</span>
+                    <span>15,400 💎</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+                    <span>2. Admin_Bot</span>
+                    <span>12,100 💎</span>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('game-page', this)">
+            <span class="tab-icon">⚔️</span>
+            <span>Арена</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('stats-page', this)">
+            <span class="tab-icon">🏆</span>
+            <span>Топ</span>
+        </div>
+        <div class="tab-item" onclick="tg.close()">
+            <span class="tab-icon">🚪</span>
+            <span>Выход</span>
+        </div>
+    </nav>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        // Берем данные из Телеграма
-        const user = tg.initDataUnsafe.user;
-        if (user) {
-            document.getElementById("user_name").innerText = user.first_name;
-            if (user.photo_url) {
-                document.getElementById("user_photo").src = user.photo_url;
+        // Загрузка баланса из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userBalance = urlParams.get('balance');
+        document.getElementById("balance_val").innerText = userBalance || "100";
+
+        // Данные юзера
+        if (tg.initDataUnsafe.user) {
+            document.getElementById("user_name").innerText = tg.initDataUnsafe.user.first_name;
+            if (tg.initDataUnsafe.user.photo_url) {
+                document.getElementById("user_pic").src = tg.initDataUnsafe.user.photo_url;
             }
         }
 
-        // Кнопка закрытия
-        tg.MainButton.setText("ИГРАТЬ").show();
+        function switchTab(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function startSearch() {
+            tg.HapticFeedback.impactOccurred('medium');
+            document.getElementById('card-content').style.display = 'none';
+            document.getElementById('search-content').style.display = 'block';
+            document.querySelector('.searching-loader').style.display = 'block';
+        }
+
+        function stopSearch() {
+            document.getElementById('card-content').style.display = 'block';
+            document.getElementById('search-content').style.display = 'none';
+        }
     </script>
 </body>
 </html>
