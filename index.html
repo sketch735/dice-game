@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICE CLASH</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background: radial-gradient(circle, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #00d2ff;
+            box-shadow: 0 0 15px #00d2ff;
+            margin-bottom: 10px;
+        }
+
+        .balance-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #00d2ff;
+            display: block;
+        }
+
+        .main-menu {
+            display: grid;
+            gap: 15px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .status-tag {
+            font-size: 12px;
+            background: #3a7bd5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img id="user_photo" src="https://via.placeholder.com/80" class="user-avatar" alt="Ava">
+        <h2 id="user_name">Загрузка...</h2>
+        <span class="status-tag">ИГРОК</span>
+    </div>
+
+    <div class="balance-card">
+        <span style="font-size: 14px; opacity: 0.7;">ТВОЙ БАЛАНС</span>
+        <span class="balance-amount" id="balance">100 💎</span>
+    </div>
+
+    <div class="main-menu">
+        <button class="btn" onclick="tg.showAlert('Поиск соперника скоро будет доступен!')">⚔️ НАЙТИ ДУЭЛЬ</button>
+        <button class="btn btn-secondary" onclick="tg.showAlert('Топ игроков в разработке')">🏆 РЕЙТИНГ</button>
+        <button class="btn btn-secondary" onclick="tg.close()">ВЫХОД</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Берем данные из Телеграма
+        const user = tg.initDataUnsafe.user;
+        if (user) {
+            document.getElementById("user_name").innerText = user.first_name;
+            if (user.photo_url) {
+                document.getElementById("user_photo").src = user.photo_url;
+            }
+        }
+
+        // Кнопка закрытия
+        tg.MainButton.setText("ИГРАТЬ").show();
+    </script>
+</body>
+</html>
