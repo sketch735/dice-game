@@ -57,7 +57,7 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Preview Area */
+        /* Preview Area & Animations */
         .preview-box {
             height: 120px;
             display: flex;
@@ -65,13 +65,38 @@
             justify-content: center;
             font-size: 80px;
             margin-bottom: 20px;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; /* Для позиционирования эмодзи */
         }
 
-        .bounce { animation: bounce 2s infinite; }
-        @keyframes bounce { 
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        /* Dice Animation */
+        .dice-anim {
+            animation: rollDice 0.7s ease-out forwards;
+        }
+        @keyframes rollDice {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.5; }
+            50% { transform: translate(20px, -20px) rotate(180deg); opacity: 1; }
+            100% { transform: translate(0, 0) rotate(360deg); opacity: 1; }
+        }
+
+        /* Basket Animation */
+        .basket-anim {
+            animation: shootBasket 1s ease-out forwards;
+        }
+        @keyframes shootBasket {
+            0% { transform: translate(-50px, 50px) scale(0.8); opacity: 0; }
+            30% { transform: translate(0, -30px) scale(1.1); opacity: 1; }
+            70% { transform: translate(0, 10px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Football Animation */
+        .football-anim {
+            animation: kickFootball 1s ease-out forwards;
+        }
+        @keyframes kickFootball {
+            0% { transform: translateX(-50px) translateY(20px) rotate(0deg); opacity: 0.5; }
+            50% { transform: translateX(20px) translateY(-20px) rotate(180deg); opacity: 1; }
+            100% { transform: translateX(0) translateY(0) rotate(360deg); opacity: 1; }
         }
 
         .glass-card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 30px; padding: 20px; width: 90%; margin-bottom: 15px; text-align: center; }
@@ -115,7 +140,7 @@
 
     <div class="content">
         <div id="gamba-page" class="page active">
-            <div class="preview-box bounce" id="mode-preview">🎲</div>
+            <div class="preview-box" id="mode-preview">🎲</div>
             
             <div class="glass-card">
                 <h2 id="mode-title" style="margin: 0;">Dice Clash</h2>
@@ -215,13 +240,23 @@
 
         function updateMode(mode, icon, title, el) {
             const preview = document.getElementById('mode-preview');
-            preview.style.transform = 'scale(0)';
             
-            setTimeout(() => {
+            // Удаляем старые анимации
+            preview.className = 'preview-box'; 
+            
+            setTimeout(() => { // Запускаем анимацию после очистки
                 preview.innerText = icon;
                 document.getElementById('mode-title').innerText = title;
-                preview.style.transform = 'scale(1)';
-            }, 200);
+
+                // Добавляем новую анимацию
+                if (mode === 'dice') {
+                    preview.classList.add('dice-anim');
+                } else if (mode === 'basket') {
+                    preview.classList.add('basket-anim');
+                } else if (mode === 'football') {
+                    preview.classList.add('football-anim');
+                }
+            }, 50); // Небольшая задержка, чтобы анимация сбросилась
 
             document.querySelectorAll('.mode-card').forEach(m => m.classList.remove('active'));
             el.classList.add('active');
@@ -244,6 +279,11 @@
         function copyLink() {
             tg.showAlert("Ссылка скопирована!");
         }
+
+        // Инициализируем анимацию для первого режима при загрузке
+        window.onload = () => {
+            updateMode('dice', '🎲', 'Dice Clash', document.querySelector('.mode-card.active'));
+        };
     </script>
 </body>
 </html>
