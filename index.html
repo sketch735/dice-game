@@ -5,122 +5,172 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --glass: rgba(255,255,255,0.08); --accent: #0088cc; }
+        :root { --glass: rgba(255,255,255,0.08); --accent: #0088cc; --gold: #ffd700; }
         body { 
-            background: #000; color: #fff; font-family: -apple-system, sans-serif; 
+            background: #000; color: #fff; font-family: -apple-system, system-ui, sans-serif; 
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
-        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .content { flex: 1; padding: 10px 15px; overflow-y: auto; }
-        .glass { 
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px;
-        }
-        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .game-card { 
-            background: var(--glass); border-radius: 18px; padding: 15px; text-align: center;
-            border: 1px solid transparent; transition: 0.2s;
-        }
-        .game-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.2); }
-        .game-card:active { transform: scale(0.95); }
+        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 0 15px; overflow-y: auto; }
         
-        /* Анимация подбрасывания */
-        .stage { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 80px; }
-        .bounce { animation: toss 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes toss {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-100px) rotate(180deg) scale(1.2); }
-            100% { transform: translateY(0) rotate(360deg) scale(1); }
+        /* Стеклянные элементы */
+        .glass { 
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px;
         }
 
-        .btn-play { 
+        /* Игровая сцена */
+        .stage { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .display-emoji { font-size: 70px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
+        /* Анимация вращения/подброса */
+        .rolling { animation: roll 0.15s infinite linear; }
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Сетка игр */
+        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .game-card { 
+            background: var(--glass); border-radius: 20px; padding: 15px; text-align: center;
+            border: 1px solid transparent; transition: all 0.3s ease;
+        }
+        .game-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.15); box-shadow: 0 0 15px rgba(0,136,204,0.3); }
+        .game-card:active { transform: scale(0.92); }
+        .game-card div { font-size: 32px; margin-bottom: 5px; }
+
+        /* Профиль */
+        .profile-stat { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .xp-container { background: rgba(255,255,255,0.05); height: 10px; border-radius: 5px; overflow: hidden; }
+        .xp-fill { background: linear-gradient(90deg, var(--accent), #00d4ff); height: 100%; width: 65%; }
+
+        .btn-main { 
             background: #fff; color: #000; border: none; width: 100%; 
-            padding: 16px; border-radius: 15px; font-weight: 700; font-size: 16px; margin-top: 15px;
+            padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin: 20px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
+        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
+
+        /* Навигация */
         .nav { 
-            position: fixed; bottom: 15px; left: 15px; right: 15px; 
-            background: rgba(15,15,15,0.9); display: flex; border-radius: 25px; padding: 5px;
+            position: fixed; bottom: 20px; left: 20px; right: 20px; 
+            background: rgba(25,25,25,0.8); backdrop-filter: blur(20px); 
+            display: flex; border-radius: 28px; padding: 6px; border: 1px solid rgba(255,255,255,0.05);
         }
-        .nav-item { flex: 1; text-align: center; padding: 12px; opacity: 0.4; font-size: 20px; }
-        .nav-item.active { opacity: 1; color: var(--accent); }
+        .nav-item { flex: 1; text-align: center; padding: 14px; opacity: 0.3; font-size: 24px; transition: 0.3s; }
+        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div><small style="opacity:0.5">Привет,</small><br><b id="u_name">Игрок</b></div>
-    <div class="glass" style="padding: 5px 12px;"><b id="bal">100</b> 💎</div>
+    <div id="user_block"><small style="opacity:0.5">Элита,</small><br><b id="u_name">Игрок</b></div>
+    <div class="glass" style="padding: 8px 16px; border-radius: 16px;"><b id="bal" style="color:var(--gold)">1,250</b> 💎</div>
 </div>
 
 <div class="content">
-    <div id="p-game">
-        <div class="stage"><div id="emoji">🎲</div></div>
+    <div id="p-game" class="tab-content">
+        <div class="stage">
+            <div id="emoji-display" class="display-emoji">🎲</div>
+        </div>
         
         <div class="games-grid">
-            <div class="game-card active" onclick="setMode('🎲', 'Куб', this)">
+            <div class="game-card active" onclick="setMode('🎲', 'DICE')">
                 <div>🎲</div><small>Куб</small>
             </div>
-            <div class="game-card" onclick="setMode('⚽', 'Футбол', this)">
+            <div class="game-card" onclick="setMode('⚽', 'FOOTBALL')">
                 <div>⚽</div><small>Футбол</small>
             </div>
-            <div class="game-card" onclick="setMode('🏀', 'Баскет', this)">
+            <div class="game-card" onclick="setMode('🏀', 'BASKET')">
                 <div>🏀</div><small>Баскет</small>
             </div>
-            <div class="game-card" onclick="setMode('🎳', 'Боулинг', this)">
-                <div>🎳</div><small>Кегли</small>
+            <div class="game-card" onclick="setMode('🎰', 'SLOTS')">
+                <div>🎰</div><small>Слоты</small>
             </div>
         </div>
-        <button class="btn-play" onclick="play()">БРОСИТЬ</button>
+        <button class="btn-main" onclick="play()">ПОПЫТАТЬ УДАЧУ</button>
     </div>
 
-    <div id="p-prof" style="display:none">
+    <div id="p-prof" class="tab-content" style="display:none">
         <div class="glass">
-            <h3>Профиль</h3>
-            <p>Уровень: 1 [Новичок]</p>
-            <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px;">
-                <div style="background:var(--accent); width:20%; height:100%; border-radius:4px;"></div>
+            <div class="profile-stat">
+                <span>Ранг: <b>Золотая лига</b></span>
+                <span style="color:var(--accent)">#124</span>
             </div>
-            <p style="font-size:12px; opacity:0.6">Опыт: 200 / 1000 XP</p>
+            <div class="xp-container">
+                <div class="xp-fill"></div>
+            </div>
+            <p style="font-size:12px; opacity:0.5; margin-top:8px">Опыт до нового уровня: 450 XP</p>
+        </div>
+
+        <div class="glass" style="margin-top:15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="text-align:center">
+                <small style="opacity:0.5">Побед</small><br><b>342</b>
+            </div>
+            <div style="text-align:center">
+                <small style="opacity:0.5">В игре</small><br><b>12д</b>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="nav">
-    <div class="nav-item active" onclick="tab('p-game', this)">🎮</div>
-    <div class="nav-item" onclick="tab('p-prof', this)">👤</div>
+    <div class="nav-item active" onclick="switchTab('p-game', this)">🎮</div>
+    <div class="nav-item" onclick="switchTab('p-prof', this)">👤</div>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
-    let currentEmoji = '🎲';
+    let mode = 'DICE';
+    let isRolling = false;
+
     document.getElementById('u_name').innerText = tg.initDataUnsafe.user?.first_name || "Игрок";
 
-    function setMode(e, txt, el) {
-        currentEmoji = e;
-        document.getElementById('emoji').innerText = e;
+    function setMode(m, type) {
+        if(isRolling) return;
+        mode = type;
+        document.getElementById('emoji-display').innerText = m;
         document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
+        event.currentTarget.classList.add('active');
         tg.HapticFeedback.selectionChanged();
     }
 
     function play() {
-        const el = document.getElementById('emoji');
-        el.classList.remove('bounce');
-        void el.offsetWidth; // Reset animation
-        el.classList.add('bounce');
-        tg.HapticFeedback.impactOccurred('medium');
-        
+        if(isRolling) return;
+        isRolling = true;
+        const display = document.getElementById('emoji-display');
+        display.classList.add('rolling');
+        tg.HapticFeedback.impactOccurred('heavy');
+
+        // Имитация задержки результата (азарт)
         setTimeout(() => {
-            // Здесь будет логика результата, но эмодзи остается тем же!
-            tg.HapticFeedback.notificationOccurred('success');
-        }, 600);
+            display.classList.remove('rolling');
+            let result = '';
+            
+            if(mode === 'DICE') {
+                const dice = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣'];
+                result = dice[Math.floor(Math.random()*dice.length)];
+            } else if(mode === 'SLOTS') {
+                const items = ['💎','🍒','7️⃣','🍋'];
+                result = items[Math.floor(Math.random()*items.length)] + items[Math.floor(Math.random()*items.length)] + items[Math.floor(Math.random()*items.length)];
+            } else {
+                result = Math.random() > 0.5 ? '✅ ГОЛ!' : '❌ МИМО';
+            }
+
+            display.innerText = result;
+            isRolling = false;
+            tg.HapticFeedback.notificationOccurred(result.includes('❌') ? 'error' : 'success');
+        }, 1200);
     }
 
-    function tab(id, el) {
-        document.getElementById('p-game').style.display = id === 'p-game' ? 'block' : 'none';
-        document.getElementById('p-prof').style.display = id === 'p-prof' ? 'block' : 'none';
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         el.classList.add('active');
+        tg.HapticFeedback.impactOccurred('light');
     }
 </script>
 </body>
