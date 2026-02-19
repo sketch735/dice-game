@@ -9,70 +9,84 @@
         body { 
             background: #000; color: #fff; font-family: -apple-system, sans-serif; 
             margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
-            transition: background 0.5s ease;
         }
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .content { flex: 1; padding: 0 20px; overflow-y: auto; }
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 0 15px; overflow-y: auto; }
         .glass { 
             background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 25px; padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 15px;
         }
 
-        /* ТГ-Анимация: Эффект живого веса */
-        .stage { height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        #emoji { font-size: 80px; transition: transform 0.1s; z-index: 2; }
-        
-        /* Сложная анимация броска */
-        .tg-toss { animation: tg-toss 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
-        @keyframes tg-toss {
-            0% { transform: scale(1) translateY(0); }
-            20% { transform: scale(1.2, 0.8) translateY(0); } /* Сжатие перед прыжком */
-            50% { transform: scale(0.9, 1.1) translateY(-80px) rotate(180deg); } /* Полет */
-            80% { transform: scale(1.1, 0.9) translateY(10px); } /* Удар о землю */
-            100% { transform: scale(1) translateY(0) rotate(360deg); }
+        /* ОГРАНИЧЕННАЯ СЦЕНА */
+        .stage { 
+            height: 160px; position: relative; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 24px; background: rgba(255,255,255,0.02); margin-bottom: 15px;
+        }
+        #emoji { font-size: 75px; z-index: 2; will-change: transform; }
+
+        /* АНИМАЦИЯ: КУБ (Хаос) */
+        .anim-dice { animation: dice-phys 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes dice-phys {
+            0% { transform: scale(1) rotate(0); }
+            30% { transform: scale(0.7, 1.3) translateY(-60px) rotate(180deg); }
+            60% { transform: scale(1.1, 0.9) translateY(20px) rotate(360deg); }
+            80% { transform: scale(0.95, 1.05) translateY(-10px); }
+            100% { transform: scale(1) translateY(0); }
         }
 
-        .res-txt { position: absolute; top: 10px; font-weight: 900; font-size: 24px; opacity: 0; transform: scale(0.5); transition: 0.4s; }
-        .res-txt.show { opacity: 1; transform: scale(1.2); }
+        /* АНИМАЦИЯ: МЯЧ (Вылет) */
+        .anim-ball { animation: ball-phys 0.7s ease-out; }
+        @keyframes ball-phys {
+            0% { transform: translateY(150px) scale(0.5); opacity: 0; }
+            50% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); }
+        }
 
-        /* Сетка */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        /* АНИМАЦИЯ: СЛОТЫ (Тряска барабана) */
+        .anim-slot { animation: slot-phys 0.1s infinite; }
+        @keyframes slot-phys {
+            0% { transform: translateY(-2px); }
+            100% { transform: translateY(2px); }
+        }
+
+        .res-overlay { 
+            position: absolute; top: 10px; font-weight: 900; font-size: 26px; 
+            opacity: 0; transition: 0.3s; pointer-events: none;
+        }
+        .res-overlay.show { opacity: 1; transform: scale(1.2); }
+
+        /* СЕТКА И КНОПКИ */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .card { 
-            background: var(--glass); border-radius: 22px; padding: 15px; text-align: center;
-            border: 1px solid transparent; transition: 0.3s;
+            background: var(--glass); border-radius: 20px; padding: 12px; text-align: center;
+            border: 1px solid transparent; transition: 0.2s;
         }
-        .card.active { border-color: var(--accent); background: rgba(0,136,204,0.12); }
-        .card:active { transform: scale(0.92); }
-
+        .card.active { border-color: var(--accent); background: rgba(0,136,204,0.1); }
         .btn { 
             background: #fff; color: #000; border: none; width: 100%; 
-            padding: 20px; border-radius: 22px; font-weight: 800; font-size: 16px; margin-top: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 15px;
         }
-
-        /* Цитата и Профиль */
-        .quote { font-style: italic; opacity: 0.5; font-size: 12px; margin-top: 10px; line-height: 1.4; }
 
         .nav { 
             position: fixed; bottom: 20px; left: 20px; right: 20px; 
-            background: rgba(15,15,15,0.9); display: flex; border-radius: 30px; padding: 5px;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(15,15,15,0.9); display: flex; border-radius: 28px; padding: 5px;
         }
-        .nav-item { flex: 1; text-align: center; padding: 14px; opacity: 0.3; font-size: 24px; transition: 0.3s; }
+        .nav-item { flex: 1; text-align: center; padding: 12px; opacity: 0.3; font-size: 22px; }
         .nav-item.active { opacity: 1; color: var(--accent); }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div><small style="opacity:0.4">Elite Member</small><br><b id="u_name">Игрок</b></div>
-    <div class="glass" style="padding: 8px 16px; border-radius: 18px;"><b id="bal" style="color:var(--gold)">1250</b> 💎</div>
+    <div><small style="opacity:0.4">Elite</small><br><b id="u_name">Player</b></div>
+    <div class="glass" style="padding: 6px 14px; border-radius: 14px;"><b id="bal" style="color:var(--gold)">1500</b> 💎</div>
 </div>
 
 <div class="content">
     <div id="p-game">
-        <div class="stage">
-            <div id="res" class="res-txt"></div>
+        <div class="stage glass">
+            <div id="res" class="res-overlay"></div>
             <div id="emoji">🎰</div>
         </div>
         <div class="grid">
@@ -81,19 +95,15 @@
             <div class="card" onclick="setMode('⚽','BALL',this)"><div>⚽</div><small>Футбол</small></div>
             <div class="card" onclick="setMode('🏀','BALL',this)"><div>🏀</div><small>Баскет</small></div>
         </div>
-        <button class="btn" onclick="play()">ПОПЫТАТЬ УДАЧУ</button>
+        <button class="btn" onclick="play()">ИГРАТЬ</button>
     </div>
 
     <div id="p-prof" style="display:none">
         <div class="glass">
-            <h3 style="margin-top:0">Профиль</h3>
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px">
-                <span style="opacity:0.7">Уровень 5</span><span style="color:var(--accent)">VIP</span>
+            <p>Статус: <b>VIP</b></p>
+            <div style="font-style: italic; opacity:0.5; font-size:11px; border-top:1px solid #222; padding-top:10px">
+                «Улыбка, малыш, улыбка, лучшее что есть в человеке.».
             </div>
-            <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px"><div style="background:var(--accent); width:65%; height:100%"></div></div>
-            
-            <p style="margin-bottom:4px; margin-top:20px">Статус: <b>Активен</b></p>
-            <div class="quote">«Улыбайся, малыш, улыбайся. Лучшее, что есть в человеке — это улыбка».</div>
         </div>
     </div>
 </div>
@@ -110,44 +120,42 @@
 
     function setMode(e, m, el) {
         if(busy) return;
-        mode = m;
-        document.getElementById('emoji').innerText = e;
+        mode = m; document.getElementById('emoji').innerText = e;
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-        tg.HapticFeedback.selectionChanged();
+        el.classList.add('active'); tg.HapticFeedback.selectionChanged();
     }
 
     function play() {
-        if(busy) return;
-        busy = true;
-        const e = document.getElementById('emoji');
-        const r = document.getElementById('res');
-        
-        e.classList.remove('tg-toss');
-        void e.offsetWidth; 
-        e.classList.add('tg-toss');
+        if(busy) return; busy = true;
+        const e = document.getElementById('emoji'), r = document.getElementById('res');
         r.classList.remove('show');
         
+        // ВЫБОР АНИМАЦИИ
+        e.className = '';
+        if(mode === 'DICE') e.classList.add('anim-dice');
+        else if(mode === 'BALL') e.classList.add('anim-ball');
+        else e.classList.add('anim-slot');
+
         tg.HapticFeedback.impactOccurred('heavy');
 
         setTimeout(() => {
+            e.className = '';
             let win = Math.random() < 0.3;
-            if(mode === 'SLOT') e.innerText = win ? '7️⃣7️⃣7️⃣' : '🍋🍒💎';
-            else if(mode === 'DICE') e.innerText = win ? '6️⃣' : '1️⃣';
-            else e.innerText = win ? '✅' : '❌';
-
-            r.innerText = win ? 'WIN +50' : 'TRY AGAIN';
-            r.style.color = win ? '#ffd700' : '#ff4d4d';
-            r.classList.add('show');
-            
-            if(win) {
-                document.body.style.background = '#001a0d'; // От меня: мягкая вспышка при победе
-                setTimeout(() => document.body.style.background = '#000', 400);
+            if(mode === 'SLOT') {
+                const s = ['🍒','🍋','💎','7️⃣'];
+                e.innerText = win ? '7️⃣7️⃣7️⃣' : s[0]+s[1]+s[2];
+            } else if(mode === 'DICE') {
+                e.innerText = win ? '6️⃣' : '1️⃣';
+            } else {
+                e.innerText = win ? '✅' : '❌';
             }
 
+            r.innerText = win ? 'WIN!' : 'LOSE';
+            r.style.color = win ? '#ffd700' : '#ff4d4d';
+            r.classList.add('show');
             busy = false;
             tg.HapticFeedback.notificationOccurred(win ? 'success' : 'error');
-        }, 750);
+        }, 800);
     }
 
     function tab(id, el) {
@@ -155,7 +163,6 @@
         document.getElementById('p-prof').style.display = id === 'p-prof' ? 'block' : 'none';
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        tg.HapticFeedback.impactOccurred('light');
     }
 </script>
 </body>
