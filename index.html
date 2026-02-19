@@ -3,175 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DICE CLASH: ELITE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --glass: rgba(255,255,255,0.08); --accent: #0088cc; --gold: #ffd700; }
-        body { 
-            background: #000; color: #fff; font-family: -apple-system, system-ui, sans-serif; 
-            margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #0088cc;
+            --gold: #ffd700;
+            --bg-dark: #0a0a0a;
+            --text-light: rgba(255, 255, 255, 0.7);
         }
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .content { flex: 1; padding: 0 15px; overflow-y: auto; }
-        
-        /* Стеклянные элементы */
-        .glass { 
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 20px;
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: radial-gradient(circle at top right, #1a1a1a, #000);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            overscroll-behavior: none;
+        }
+
+        .header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info b { font-size: 1.2em; letter-spacing: -0.5px; }
+
+        /* Контейнер страниц */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 100px; /* Отступ для навигации */
+            scroll-behavior: smooth;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Стеклянные карточки */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
         }
 
         /* Игровая сцена */
-        .stage { height: 160px; display: flex; align-items: center; justify-content: center; position: relative; }
-        .display-emoji { font-size: 70px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        /* Анимация вращения/подброса */
-        .rolling { animation: roll 0.15s infinite linear; }
-        @keyframes roll {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
+        .game-stage {
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Сетка игр */
-        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .game-card { 
-            background: var(--glass); border-radius: 20px; padding: 15px; text-align: center;
-            border: 1px solid transparent; transition: all 0.3s ease;
+        .game-display {
+            font-size: 70px;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.2s ease-out; /* Для плавности */
         }
-        .game-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.15); box-shadow: 0 0 15px rgba(0,136,204,0.3); }
-        .game-card:active { transform: scale(0.92); }
-        .game-card div { font-size: 32px; margin-bottom: 5px; }
+
+        .result-text {
+            position: absolute;
+            font-size: 36px;
+            font-weight: 800;
+            opacity: 0;
+            transform: translateY(20px);
+            z-index: 3;
+            pointer-events: none;
+            text-shadow: 0 0 15px rgba(0,0,0,0.8);
+        }
+        .result-text.show {
+            animation: showResult 0.8s ease-out forwards;
+        }
+        @keyframes showResult {
+            0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+            30% { opacity: 1; transform: translateY(0px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+        }
+
+
+        /* Анимации для каждого типа */
+        .dice-anim { animation: diceRoll 0.8s cubic-bezier(0.2, 0.8, 0.5, 1.2) forwards; }
+        @keyframes diceRoll {
+            0% { transform: translateY(0) rotateY(0deg); opacity: 1; }
+            40% { transform: translateY(-60px) rotateY(180deg) scale(1.1); opacity: 1; }
+            70% { transform: translateY(10px) rotateY(360deg) scale(0.9); opacity: 1; }
+            100% { transform: translateY(0) rotateY(360deg) scale(1); opacity: 1; }
+        }
+
+        .ball-anim { animation: ballBounce 0.8s cubic-bezier(0.2, 0.8, 0.5, 1.2) forwards; }
+        @keyframes ballBounce {
+            0% { transform: translateY(100px) scale(0.8) rotate(0deg); opacity: 0; }
+            30% { transform: translateY(-20px) scale(1.1) rotate(180deg); opacity: 1; }
+            70% { transform: translateY(5px) scale(0.95) rotate(360deg); opacity: 1; }
+            100% { transform: translateY(0) scale(1) rotate(360deg); opacity: 1; }
+        }
+
+        .slot-reel {
+            display: inline-block;
+            font-size: 60px;
+            width: 70px;
+            height: 70px;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        .slot-reel span {
+            display: block;
+            line-height: 70px;
+            text-align: center;
+            transition: transform 0.2s ease-out; /* Отдельная анимация для смены символов */
+        }
+        .slot-spinning .slot-reel span {
+            animation: spinReel 0.1s steps(1) infinite;
+        }
+        @keyframes spinReel {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-70px); } /* Один шаг прокрутки */
+        }
+        /* Анимации замедления для слотов будут в JS */
+
+
+        /* Режимы игры (карточки) */
+        .games-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .game-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .game-item.active {
+            border-color: var(--accent);
+            background: rgba(0, 136, 204, 0.15);
+            box-shadow: 0 0 15px rgba(0,136,204,0.3);
+        }
+        .game-item:active { transform: scale(0.92); }
+
+        .game-icon { font-size: 40px; margin-bottom: 8px; display: block; }
+        .game-label { font-size: 13px; font-weight: 600; opacity: 0.9; letter-spacing: 0.5px; }
 
         /* Профиль */
-        .profile-stat { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .xp-container { background: rgba(255,255,255,0.05); height: 10px; border-radius: 5px; overflow: hidden; }
-        .xp-fill { background: linear-gradient(90deg, var(--accent), #00d4ff); height: 100%; width: 65%; }
-
-        .btn-main { 
-            background: #fff; color: #000; border: none; width: 100%; 
-            padding: 18px; border-radius: 20px; font-weight: 800; font-size: 16px; margin: 20px 0;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        .profile-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-light);
         }
-        .btn-main:active { transform: scale(0.96); opacity: 0.9; }
-
-        /* Навигация */
-        .nav { 
-            position: fixed; bottom: 20px; left: 20px; right: 20px; 
-            background: rgba(25,25,25,0.8); backdrop-filter: blur(20px); 
-            display: flex; border-radius: 28px; padding: 6px; border: 1px solid rgba(255,255,255,0.05);
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
         }
-        .nav-item { flex: 1; text-align: center; padding: 14px; opacity: 0.3; font-size: 24px; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-2px); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #0088cc, #00d4ff); width: 60%; transition: width 1s ease-out; }
+
+        /* Задания */
+        .task-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .task-item .icon { font-size: 24px; margin-right: 10px; }
+        .task-item .details { flex-grow: 1; }
+        .task-item .reward { font-weight: 700; color: var(--gold); }
+        .task-item .progress-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 5px; }
+        .task-item .progress-fill { background: var(--accent); width: 70%; height: 100%; border-radius: 2px; }
+
+        /* Рекламный баннер */
+        .ad-banner {
+            background: linear-gradient(45deg, #1f1f1f, #2a2a2a);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: transform 0.2s ease-out;
+        }
+        .ad-banner:active { transform: scale(0.95); }
+        .ad-banner strong { color: var(--gold); }
+
+
+        /* Главная кнопка */
+        .btn-main {
+            background: white;
+            color: black;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .btn-main:active { transform: scale(0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        /* Нижнее меню */
+        .nav-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            display: flex;
+            padding: 6px;
+            border: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            font-size: 24px;
+            opacity: 0.4;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn.active { opacity: 1; color: var(--accent); transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div id="user_block"><small style="opacity:0.5">Элита,</small><br><b id="u_name">Игрок</b></div>
-    <div class="glass" style="padding: 8px 16px; border-radius: 16px;"><b id="bal" style="color:var(--gold)">1,250</b> 💎</div>
-</div>
-
-<div class="content">
-    <div id="p-game" class="tab-content">
-        <div class="stage">
-            <div id="emoji-display" class="display-emoji">🎲</div>
+    <div class="header">
+        <div class="user-info">
+            <span style="opacity: 0.5; font-size: 12px; display: block;">Элита,</span>
+            <b><span id="u_name">Игрок</span></b>
         </div>
-        
-        <div class="games-grid">
-            <div class="game-card active" onclick="setMode('🎲', 'DICE')">
-                <div>🎲</div><small>Куб</small>
-            </div>
-            <div class="game-card" onclick="setMode('⚽', 'FOOTBALL')">
-                <div>⚽</div><small>Футбол</small>
-            </div>
-            <div class="game-card" onclick="setMode('🏀', 'BASKET')">
-                <div>🏀</div><small>Баскет</small>
-            </div>
-            <div class="game-card" onclick="setMode('🎰', 'SLOTS')">
-                <div>🎰</div><small>Слоты</small>
-            </div>
-        </div>
-        <button class="btn-main" onclick="play()">ПОПЫТАТЬ УДАЧУ</button>
-    </div>
-
-    <div id="p-prof" class="tab-content" style="display:none">
-        <div class="glass">
-            <div class="profile-stat">
-                <span>Ранг: <b>Золотая лига</b></span>
-                <span style="color:var(--accent)">#124</span>
-            </div>
-            <div class="xp-container">
-                <div class="xp-fill"></div>
-            </div>
-            <p style="font-size:12px; opacity:0.5; margin-top:8px">Опыт до нового уровня: 450 XP</p>
-        </div>
-
-        <div class="glass" style="margin-top:15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div style="text-align:center">
-                <small style="opacity:0.5">Побед</small><br><b>342</b>
-            </div>
-            <div style="text-align:center">
-                <small style="opacity:0.5">В игре</small><br><b>12д</b>
-            </div>
+        <div class="glass-card" style="margin:0; padding: 10px 18px; border-radius: 18px;">
+            <b id="balance_val" style="color: var(--gold);">1,250</b> 💎
         </div>
     </div>
-</div>
 
-<div class="nav">
-    <div class="nav-item active" onclick="switchTab('p-game', this)">🎮</div>
-    <div class="nav-item" onclick="switchTab('p-prof', this)">👤</div>
-</div>
+    <div class="content">
+        <div id="home-page" class="page active">
+            <div class="game-stage glass-card" style="padding-bottom: 0;">
+                <div id="game-display" class="game-display">🎰</div>
+                <div id="result-message" class="result-text"></div>
+            </div>
 
-<script>
-    let tg = window.Telegram.WebApp;
-    let mode = 'DICE';
-    let isRolling = false;
+            <div class="games-grid">
+                <div class="game-item active" onclick="setGameMode('🎰', 'SLOT', this)">
+                    <span class="game-icon">🎰</span>
+                    <span class="game-label">Слоты</span>
+                </div>
+                <div class="game-item" onclick="setGameMode('🎲', 'DICE', this)">
+                    <span class="game-icon">🎲</span>
+                    <span class="game-label">Куб</span>
+                </div>
+                <div class="game-item" onclick="setGameMode('⚽', 'FOOTBALL', this)">
+                    <span class="game-icon">⚽</span>
+                    <span class="game-label">Футбол</span>
+                </div>
+                <div class="game-item" onclick="setGameMode('🏀', 'BASKET', this)">
+                    <span class="game-icon">🏀</span>
+                    <span class="game-label">Баскет</span>
+                </div>
+            </div>
 
-    document.getElementById('u_name').innerText = tg.initDataUnsafe.user?.first_name || "Игрок";
+            <button class="btn-main" onclick="playGame()">ПОПЫТАТЬ УДАЧУ (10 💎)</button>
 
-    function setMode(m, type) {
-        if(isRolling) return;
-        mode = type;
-        document.getElementById('emoji-display').innerText = m;
-        document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
-        event.currentTarget.classList.add('active');
-        tg.HapticFeedback.selectionChanged();
-    }
+            <div class="ad-banner" onclick="tg.openLink('https://adsgram.ai/')" style="margin-bottom: 100px;">
+                Реклама: <strong>Смотри видео</strong> и получай 💎
+            </div>
+        </div>
 
-    function play() {
-        if(isRolling) return;
-        isRolling = true;
-        const display = document.getElementById('emoji-display');
-        display.classList.add('rolling');
-        tg.HapticFeedback.impactOccurred('heavy');
+        <div id="profile-page" class="page">
+            <div class="glass-card">
+                <h3 class="profile-section-title">Твой прогресс</h3>
+                <div class="stat-row">
+                    <span>Уровень: <b>5</b></span>
+                    <span>Ранг: <b style="color: var(--accent);">Золото</b></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p style="font-size: 12px; opacity: 0.7; margin-top: 8px;">До следующего уровня: 250 XP</p>
+            </div>
 
-        // Имитация задержки результата (азарт)
-        setTimeout(() => {
-            display.classList.remove('rolling');
-            let result = '';
-            
-            if(mode === 'DICE') {
-                const dice = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣'];
-                result = dice[Math.floor(Math.random()*dice.length)];
-            } else if(mode === 'SLOTS') {
-                const items = ['💎','🍒','7️⃣','🍋'];
-                result = items[Math.floor(Math.random()*items.length)] + items[Math.floor(Math.random()*items.length)] + items[Math.floor(Math.random()*items.length)];
+            <div class="glass-card" style="margin-top: 15px;">
+                <h3 class="profile-section-title">Ежедневные задания</h3>
+                <div class="task-item">
+                    <span class="icon">🎯</span>
+                    <div class="details">
+                        <b>Сыграй 5 раз</b><br>
+                        <span style="font-size:12px; opacity:0.6;">4/5 выполнено</span>
+                        <div class="progress-bar" style="margin-top:3px;"><div class="progress-fill" style="width:80%;"></div></div>
+                    </div>
+                    <span class="reward">+20 💎</span>
+                </div>
+                <div class="task-item">
+                    <span class="icon">📺</span>
+                    <div class="details">
+                        <b>Посмотри 3 рекламы</b><br>
+                        <span style="font-size:12px; opacity:0.6;">1/3 выполнено</span>
+                        <div class="progress-bar" style="margin-top:3px;"><div class="progress-fill" style="width:33%;"></div></div>
+                    </div>
+                    <span class="reward">+50 💎</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-btn active" onclick="switchTab('home-page', this)">🎮</div>
+        <div class="nav-btn" onclick="switchTab('profile-page', this)">👤</div>
+    </nav>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let currentMode = 'SLOT';
+        let isGameBusy = false; // Флаг, чтобы избежать спама нажатий
+
+        const gameDisplay = document.getElementById('game-display');
+        const resultMessage = document.getElementById('result-message');
+        const balanceVal = document.getElementById('balance_val');
+        let userBalance = 1250; // Начальный баланс
+
+        document.getElementById('u_name').innerText = tg.initDataUnsafe.user?.first_name || "Игрок";
+
+        function updateBalance(amount) {
+            userBalance += amount;
+            balanceVal.innerText = userBalance.toLocaleString();
+        }
+
+        function switchTab(pageId, element) {
+            if (isGameBusy) return;
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function setGameMode(emoji, modeType, element) {
+            if (isGameBusy) return;
+            currentMode = modeType;
+            gameDisplay.innerText = emoji;
+
+            document.querySelectorAll('.game-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function showResult(isWin, winAmount) {
+            resultMessage.classList.remove('show'); // Сброс анимации
+            void resultMessage.offsetWidth; // Триггер рефлоу для сброса
+
+            if (isWin) {
+                resultMessage.innerText = `ПОБЕДА! +${winAmount} 💎`;
+                resultMessage.style.color = var('--gold');
+                tg.HapticFeedback.notificationOccurred('success');
             } else {
-                result = Math.random() > 0.5 ? '✅ ГОЛ!' : '❌ МИМО';
+                resultMessage.innerText = `ПРОИГРЫШ`;
+                resultMessage.style.color = '#ff4d4d'; // Красный для проигрыша
+                tg.HapticFeedback.notificationOccurred('error');
+            }
+            resultMessage.classList.add('show');
+            
+            // Скрыть сообщение после анимации
+            setTimeout(() => {
+                resultMessage.classList.remove('show');
+            }, 1200);
+        }
+
+        function playGame() {
+            if (isGameBusy || userBalance < 10) {
+                tg.HapticFeedback.notificationOccurred('error');
+                tg.showAlert('Недостаточно 💎 или игра уже идет!');
+                return;
             }
 
-            display.innerText = result;
-            isRolling = false;
-            tg.HapticFeedback.notificationOccurred(result.includes('❌') ? 'error' : 'success');
-        }, 1200);
-    }
+            isGameBusy = true;
+            updateBalance(-10); // Снимаем ставку
 
-    function switchTab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.getElementById(id).style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        tg.HapticFeedback.impactOccurred('light');
-    }
-</script>
+            gameDisplay.classList.remove('dice-anim', 'ball-anim'); // Сброс прошлых анимаций
+            resultMessage.classList.remove('show'); // Скрываем предыдущий результат
+
+            tg.HapticFeedback.impactOccurred('heavy'); // Мощная вибрация в начале
+
+            let finalResultEmoji = '';
+            let isWin = false;
+            let winAmount = 0;
+            const winChance = 0.35; // Шанс победы (можно настроить)
+
+            if (currentMode === 'DICE') {
+                gameDisplay.classList.add('dice-anim');
+                const diceFaces = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
+                setTimeout(() => {
+                    const roll = Math.floor(Math.random() * 6) + 1;
+                    finalResultEmoji = diceFaces[roll - 1];
+                    gameDisplay.innerText = finalResultEmoji;
+
+                    isWin = (roll >= 4 && Math.random() < winChance); // Шанс выиграть больше на больших числах
+                    winAmount = isWin ? (roll * 5) : 0; // Выигрыш зависит от числа
+
+                    showResult(isWin, winAmount);
+                    if (isWin) updateBalance(winAmount);
+                    isGameBusy = false;
+                }, 800);
+
+            } else if (currentMode === 'FOOTBALL' || currentMode === 'BASKET') {
+                gameDisplay.classList.add('ball-anim');
+                setTimeout(() => {
+                    isWin = Math.random() < winChance;
+                    finalResultEmoji = isWin ? '✅' : '❌';
+                    gameDisplay.innerText = finalResultEmoji;
+
+                    winAmount = isWin ? 30 : 0;
+
+                    showResult(isWin, winAmount);
+                    if (isWin) updateBalance(winAmount);
+                    isGameBusy = false;
+                }, 800);
+
+            } else if (currentMode === 'SLOT') {
+                const slotItems = ['🍒', '🍋', '💎', '7️⃣'];
+                const reels = [gameDisplay, gameDisplay, gameDisplay]; // Используем один элемент для простоты
+                
+                let reelValues = ['', '', '']; // Для каждого барабана
+                let spinTime = [800, 1000, 1200]; // Разное время остановки для эффекта
+
+                function spinSingleReel(reelIndex) {
+                    let spinInterval = setInterval(() => {
+                        reelValues[reelIndex] = slotItems[Math.floor(Math.random() * slotItems.length)];
+                        gameDisplay.innerText = reelValues.join(''); // Обновляем весь слот
+                    }, 50); // Быстрая прокрутка
+
+                    setTimeout(() => {
+                        clearInterval(spinInterval);
+                        // Определение финального значения для этого барабана
+                        if (Math.random() < winChance / 3) { // Шанс на совпадение для барабана
+                            reelValues[reelIndex] = '7️⃣'; // Увеличиваем шанс на 7
+                        } else {
+                             reelValues[reelIndex] = slotItems[Math.floor(Math.random() * slotItems.length)];
+                        }
+                        gameDisplay.innerText = reelValues.join('');
+                    }, spinTime[reelIndex]);
+                }
+
+                spinSingleReel(0);
+                setTimeout(() => spinSingleReel(1), 200); // Запускаем второй барабан с задержкой
+                setTimeout(() => spinSingleReel(2), 400); // Запускаем третий барабан с задержкой
+
+                setTimeout(() => {
+                    // Проверка результата после остановки всех барабанов
+                    if (reelValues[0] === reelValues[1] && reelValues[1] === reelValues[2] && reelValues[0] !== '') {
+                        isWin = true;
+                        winAmount = (reelValues[0] === '7️⃣') ? 100 : (reelValues[0] === '💎' ? 70 : 40);
+                    }
+
+                    showResult(isWin, winAmount);
+                    if (isWin) updateBalance(winAmount);
+                    isGameBusy = false;
+                }, spinTime[2] + 200); // Ждем, пока последний барабан остановится
+            }
+        }
+    </script>
 </body>
 </html>
