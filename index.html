@@ -3,248 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DICE CLASH: ELITE</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --accent: #0088cc;
-            --bg: #000;
+        :root { --glass: rgba(255,255,255,0.08); --accent: #0088cc; }
+        body { 
+            background: #000; color: #fff; font-family: -apple-system, sans-serif; 
+            margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .content { flex: 1; padding: 10px 15px; overflow-y: auto; }
+        .glass { 
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px;
+        }
+        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .game-card { 
+            background: var(--glass); border-radius: 18px; padding: 15px; text-align: center;
+            border: 1px solid transparent; transition: 0.2s;
+        }
+        .game-card.active { border-color: var(--accent); background: rgba(0, 136, 204, 0.2); }
+        .game-card:active { transform: scale(0.95); }
+        
+        /* Анимация подбрасывания */
+        .stage { height: 180px; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+        .bounce { animation: toss 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes toss {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-100px) rotate(180deg) scale(1.2); }
+            100% { transform: translateY(0) rotate(360deg) scale(1); }
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background: var(--bg);
-            background-image: radial-gradient(circle at top right, #1a1a1a, #000);
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+        .btn-play { 
+            background: #fff; color: #000; border: none; width: 100%; 
+            padding: 16px; border-radius: 15px; font-weight: 700; font-size: 16px; margin-top: 15px;
         }
-
-        /* Шапка с именем */
-        .header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .nav { 
+            position: fixed; bottom: 15px; left: 15px; right: 15px; 
+            background: rgba(15,15,15,0.9); display: flex; border-radius: 25px; padding: 5px;
         }
-
-        .user-info b { font-size: 1.2rem; letter-spacing: -0.5px; }
-
-        /* Контейнер страниц */
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 15px 100px;
-            scroll-behavior: smooth;
-        }
-
-        .page { display: none; animation: fadeIn 0.4s ease; }
-        .page.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Стеклянные карточки */
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: transform 0.2s;
-        }
-
-        /* Режимы игры (Мячи) */
-        .games-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .game-item {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .game-item:active { transform: scale(0.92); background: rgba(255,255,255,0.15); }
-
-        .game-icon { font-size: 40px; margin-bottom: 10px; display: block; transition: 0.5s; }
-        .game-item:hover .game-icon { transform: rotate(15deg) scale(1.1); }
-
-        .game-label { font-size: 13px; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Профиль */
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-        .progress-bar {
-            height: 6px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-        .progress-fill { height: 100%; background: var(--accent); width: 45%; transition: 1s width; }
-
-        /* Нижнее меню */
-        .nav-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(20, 20, 20, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            display: flex;
-            padding: 8px;
-            border: 1px solid var(--glass-border);
-            z-index: 100;
-        }
-
-        .nav-btn {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            font-size: 22px;
-            opacity: 0.4;
-            transition: 0.3s;
-        }
-
-        .nav-btn.active { opacity: 1; color: var(--accent); transform: scale(1.1); }
-
-        .btn-main {
-            background: white;
-            color: black;
-            border: none;
-            padding: 16px;
-            border-radius: 18px;
-            font-weight: 700;
-            width: 100%;
-            margin-top: 10px;
-            transition: 0.2s;
-        }
-        .btn-main:active { transform: scale(0.97); }
-
+        .nav-item { flex: 1; text-align: center; padding: 12px; opacity: 0.4; font-size: 20px; }
+        .nav-item.active { opacity: 1; color: var(--accent); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="user-info">
-            <span style="opacity: 0.5; font-size: 12px; display: block;">Привет,</span>
-            <b><span id="u_name">Игрок</span></b>
+<div class="header">
+    <div><small style="opacity:0.5">Привет,</small><br><b id="u_name">Игрок</b></div>
+    <div class="glass" style="padding: 5px 12px;"><b id="bal">100</b> 💎</div>
+</div>
+
+<div class="content">
+    <div id="p-game">
+        <div class="stage"><div id="emoji">🎲</div></div>
+        
+        <div class="games-grid">
+            <div class="game-card active" onclick="setMode('🎲', 'Куб', this)">
+                <div>🎲</div><small>Куб</small>
+            </div>
+            <div class="game-card" onclick="setMode('⚽', 'Футбол', this)">
+                <div>⚽</div><small>Футбол</small>
+            </div>
+            <div class="game-card" onclick="setMode('🏀', 'Баскет', this)">
+                <div>🏀</div><small>Баскет</small>
+            </div>
+            <div class="game-card" onclick="setMode('🎳', 'Боулинг', this)">
+                <div>🎳</div><small>Кегли</small>
+            </div>
         </div>
-        <div class="glass-card" style="margin:0; padding: 8px 15px; border-radius: 15px;">
-            <span id="balance_val" style="font-weight:800; color: #ffd700;">100</span> 💎
-        </div>
+        <button class="btn-play" onclick="play()">БРОСИТЬ</button>
     </div>
 
-    <div class="content">
-        <div id="home-page" class="page active">
-            <div class="games-grid">
-                <div class="game-item" onclick="playAnim('🏀')">
-                    <span class="game-icon">🏀</span>
-                    <span class="game-label">Баскетбол</span>
-                </div>
-                <div class="game-item" onclick="playAnim('⚽')">
-                    <span class="game-icon">Футбол</span>
-                    <span class="game-label">Футбол</span>
-                </div>
-                <div class="game-item" onclick="playAnim('🎲')">
-                    <span class="game-icon">🎲</span>
-                    <span class="game-label">Куб</span>
-                </div>
-                <div class="game-item" style="border: 1px dashed rgba(255,255,255,0.2); opacity: 0.6;">
-                    <span class="game-icon">🔜</span>
-                    <span class="game-label">Скоро</span>
-                </div>
+    <div id="p-prof" style="display:none">
+        <div class="glass">
+            <h3>Профиль</h3>
+            <p>Уровень: 1 [Новичок]</p>
+            <div style="background:rgba(255,255,255,0.1); height:8px; border-radius:4px;">
+                <div style="background:var(--accent); width:20%; height:100%; border-radius:4px;"></div>
             </div>
-
-            <div class="glass-card" style="margin-top: 20px; text-align: center;">
-                <div id="main-display" style="font-size: 80px; height: 100px; line-height: 100px;">🎯</div>
-                <button class="btn-main" onclick="startGame()">ИГРАТЬ (10 💎)</button>
-            </div>
-        </div>
-
-        <div id="profile-page" class="page">
-            <div class="glass-card">
-                <h3>Твой прогресс</h3>
-                <div class="stat-row">
-                    <span>Уровень</span>
-                    <b id="lvl_val">4 Уровень</b>
-                </div>
-                <div class="stat-row" style="margin-top: 15px;">
-                    <span>Опыт (XP)</span>
-                    <span>1,250 / 3,000</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="exp_bar"></div>
-                </div>
-            </div>
-
-            <div class="glass-card">
-                <h3>📺 Ads-Марафон (40% тебе)</h3>
-                <p style="font-size: 13px; opacity: 0.7;">Фонд: 4,500 💎</p>
-                <button class="btn-main" style="background: var(--accent); color: white;" onclick="tg.showAlert('Запуск рекламы...')">Смотреть рекламу</button>
-            </div>
+            <p style="font-size:12px; opacity:0.6">Опыт: 200 / 1000 XP</p>
         </div>
     </div>
+</div>
 
-    <nav class="nav-bar">
-        <div class="nav-btn active" onclick="switchTab('home-page', this)">🎮</div>
-        <div class="nav-btn" onclick="switchTab('profile-page', this)">👤</div>
-    </nav>
+<div class="nav">
+    <div class="nav-item active" onclick="tab('p-game', this)">🎮</div>
+    <div class="nav-item" onclick="tab('p-prof', this)">👤</div>
+</div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+<script>
+    let tg = window.Telegram.WebApp;
+    let currentEmoji = '🎲';
+    document.getElementById('u_name').innerText = tg.initDataUnsafe.user?.first_name || "Игрок";
 
-        let user = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "Стильный Игрок";
-        document.getElementById('u_name').innerText = user;
+    function setMode(e, txt, el) {
+        currentEmoji = e;
+        document.getElementById('emoji').innerText = e;
+        document.querySelectorAll('.game-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        tg.HapticFeedback.selectionChanged();
+    }
 
-        function switchTab(p, el) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(p).classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
-        }
+    function play() {
+        const el = document.getElementById('emoji');
+        el.classList.remove('bounce');
+        void el.offsetWidth; // Reset animation
+        el.classList.add('bounce');
+        tg.HapticFeedback.impactOccurred('medium');
+        
+        setTimeout(() => {
+            // Здесь будет логика результата, но эмодзи остается тем же!
+            tg.HapticFeedback.notificationOccurred('success');
+        }, 600);
+    }
 
-        function playAnim(icon) {
-            let display = document.getElementById('main-display');
-            display.style.transform = 'scale(0.5)';
-            display.style.opacity = '0';
-            
-            setTimeout(() => {
-                display.innerText = icon;
-                display.style.transform = 'scale(1.1)';
-                display.style.opacity = '1';
-                tg.HapticFeedback.selectionChanged();
-            }, 200);
-        }
-
-        function startGame() {
-            tg.HapticFeedback.impactOccurred('medium');
-            playAnim('⏳');
-            setTimeout(() => {
-                let icons = ['🏀', '⚽', '🎲', '🎰'];
-                playAnim(icons[Math.floor(Math.random()*icons.length)]);
-            }, 600);
-        }
-    </script>
+    function tab(id, el) {
+        document.getElementById('p-game').style.display = id === 'p-game' ? 'block' : 'none';
+        document.getElementById('p-prof').style.display = id === 'p-prof' ? 'block' : 'none';
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+    }
+</script>
 </body>
 </html>
